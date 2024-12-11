@@ -1,0 +1,24 @@
+name: SkySellWands
+version: '1.0.0'
+main: com.github.lukesky19.skySellWands.SkySellWands
+api-version: '1.21'
+depend: [SkyLib, SkyShop, Vault]
+
+commands:
+    skysellwands:
+        description: The base command.
+        aliases:
+            - sellwand
+permissions:
+    skysellwands.commands.skysellwand:
+        description: Permission to use the /skysellwand command.
+        default: op
+    skysellwands.commands.skysellwand.give:
+        description: The permission to use /skysellwand give.
+        default: op
+    skysellwands.commands.skysellwands.help:
+        description: The permission to use /skysellwand help.
+        default: op
+    skysellwands.commands.skysellwands.reload:
+        description: The permission to access /skysellwand reload.
+        default: op

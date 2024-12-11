@@ -1,0 +1,23 @@
+config-version: 1.0.0
+prefix: "<aqua><bold>SkySellWands</bold></aqua><gray> ▪ </gray>"
+help:
+    - "<aqua>SkySellWands is developed by <white><bold>lukeskywlker19</bold></white>.</aqua>"
+    - "<aqua>Source code is released on GitHub: <click:OPEN_URL:https://github.com/lukesky19><yellow><underlined><bold>https://github.com/lukesky19</bold></underlined></yellow></click></aqua>"
+    - " "
+    - "<aqua><bold>List of Commands:</bold></aqua>"
+    - "<white>/<aqua>sellwand</aqua> <yellow>help</yellow></white>"
+    - "<white>/<aqua>sellwand</aqua> <yellow>reload</yellow></white>"
+    - "<white>/<aqua>sellwand</aqua> <yellow>give</yellow> <yellow><player_name></yellow> <yellow><# of uses></yellow> <yellow><amount></yellow></white>"
+no-permission: "<red>You do not have permission for this command.</red>"
+unknown-argument: "<red>Unknown argument.</red>"
+config-reload: "<aqua>Configuration files have been reloaded.</aqua>"
+invalid-player: "<red>The player is invalid. Are they online?</red>"
+invalid-uses: "<red>The number of uses provided is not a valid integer.</red>"
+invalid-amount: "<red>The amount of sellwands to give is not a valid integer.</red>"
+# Placeholders: <uses>
+given-wand: "<aqua>You have been given a sellwand with <yellow><uses></yellow> uses.</aqua>"
+# Placeholders: <bal>
+sell-success: "<white>Sold all items in the container. Balance: <yellow><bal></yellow></white>"
+container-inventory-empty: "<red>No items were sold as the container's inventory is empty.</red>"
+no-items-sold: "<red>No items were sold as the container's inventory contained no items that could be sold.</red>"
+wand-used-up: "<dark_purple>POOF!</dark_purple> <red>Your sellwand ran out of uses.</red>"
