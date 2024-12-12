@@ -10,10 +10,10 @@ commands:
         aliases:
             - sellwand
 permissions:
-    skysellwands.commands.skysellwand:
+    skysellwands.commands.skysellwands:
         description: Permission to use the /skysellwand command.
         default: op
-    skysellwands.commands.skysellwand.give:
+    skysellwands.commands.skysellwands.give:
         description: The permission to use /skysellwand give.
         default: op
     skysellwands.commands.skysellwands.help:
