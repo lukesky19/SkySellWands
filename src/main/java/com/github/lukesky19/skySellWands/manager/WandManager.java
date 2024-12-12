@@ -28,7 +28,6 @@ import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemRarity;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
@@ -47,7 +46,7 @@ public class WandManager {
     }
 
     /**
-     * Gives a sellwand to a player.
+     * Gives a sellwand to a player with a limited number of uses.
      * @param player The player to give the sellwand to.
      * @param uses The number of uses for this sellwand.
      * @param amount The number of sellwands to give.
@@ -81,8 +80,6 @@ public class WandManager {
         @NotNull PersistentDataContainer pdc = itemMeta.getPersistentDataContainer();
         pdc.set(WandKeys.USES.getKey(), PersistentDataType.INTEGER, uses);
 
-        // Set the item's rarity
-        itemMeta.setRarity(ItemRarity.valueOf(settings.item().rarity()));
         // Set if the item is enchanted or not
         itemMeta.setEnchantmentGlintOverride(settings.item().enchanted());
 

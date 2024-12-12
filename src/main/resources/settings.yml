@@ -5,5 +5,4 @@ item:
     name: "<green><bold>SellWand</bold></green>"
     lore:
         - "<aqua><bold>Uses Left</bold></aqua> <white>: <uses></white>"
-    rarity: EPIC
     enchanted: true
