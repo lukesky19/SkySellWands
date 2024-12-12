@@ -91,6 +91,7 @@ public class PlayerClickListener implements Listener {
                             // Sell the container's inventory of items
                             boolean result = skySellWands.getSkyShopAPI().sellInventory(player, inventory);
 
+                            // If at least one item was sold, send a success message
                             if (result) {
                                 // Get the player's balance
                                 double balance = skySellWands.getEconomy().getBalance(player);
@@ -100,24 +101,29 @@ public class PlayerClickListener implements Listener {
                                 // Send player a success message
                                 player.sendMessage(FormatUtil.format(locale.prefix() + locale.sellSuccess(), placeholders));
 
-                                // Update the number of uses on the SellWand
-                                int updatedUses = uses - 1;
+                                // If the uses are not unlimited (-1), update the number of uses
+                                if(uses != -1) {
+                                    // Update the number of uses on the SellWand
+                                    int updatedUses = uses - 1;
 
-                                if (updatedUses <= 0) {
-                                    player.getInventory().remove(handItem);
+                                    // If the uses are 0, remove the item from the player's inventory
+                                    // Otherwise we just update the number of uses on the item's lore and in the PersistentDataContainer.
+                                    if (updatedUses == 0) {
+                                        player.getInventory().remove(handItem);
 
-                                    player.sendMessage(FormatUtil.format(locale.prefix() + locale.wandUsedUp()));
-                                } else {
-                                    List<TagResolver.Single> lorePlaceholders = List.of(Placeholder.parsed("uses", String.valueOf(updatedUses)));
-                                    List<Component> lore = settings.item().lore().stream().map(string -> FormatUtil.format(string, lorePlaceholders)).toList();
+                                        player.sendMessage(FormatUtil.format(locale.prefix() + locale.wandUsedUp()));
+                                    } else {
+                                        List<TagResolver.Single> lorePlaceholders = List.of(Placeholder.parsed("uses", String.valueOf(updatedUses)));
+                                        List<Component> lore = settings.item().lore().stream().map(string -> FormatUtil.format(string, lorePlaceholders)).toList();
 
-                                    itemMeta.lore(lore);
+                                        itemMeta.lore(lore);
 
-                                    pdc.set(WandKeys.USES.getKey(), PersistentDataType.INTEGER, updatedUses);
+                                        pdc.set(WandKeys.USES.getKey(), PersistentDataType.INTEGER, updatedUses);
 
-                                    handItem.setItemMeta(itemMeta);
+                                        handItem.setItemMeta(itemMeta);
 
-                                    player.getInventory().setItemInMainHand(handItem);
+                                        player.getInventory().setItemInMainHand(handItem);
+                                    }
                                 }
                             } else {
                                 // Send a message if no items were sold

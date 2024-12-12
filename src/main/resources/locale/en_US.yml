@@ -1,4 +1,4 @@
-config-version: 1.0.0
+config-version: 1.1.0
 prefix: "<aqua><bold>SkySellWands</bold></aqua><gray> ▪ </gray>"
 help:
     - "<aqua>SkySellWands is developed by <white><bold>lukeskywlker19</bold></white>.</aqua>"
@@ -7,7 +7,7 @@ help:
     - "<aqua><bold>List of Commands:</bold></aqua>"
     - "<white>/<aqua>sellwand</aqua> <yellow>help</yellow></white>"
     - "<white>/<aqua>sellwand</aqua> <yellow>reload</yellow></white>"
-    - "<white>/<aqua>sellwand</aqua> <yellow>give</yellow> <yellow><player_name></yellow> <yellow><# of uses></yellow> <yellow><amount></yellow></white>"
+    - "<white>/<aqua>sellwand</aqua> <yellow>give</yellow> <yellow><player_name></yellow> <yellow><# of uses | unlimited | infinite | inf></yellow> <yellow><amount></yellow></white>"
 no-permission: "<red>You do not have permission for this command.</red>"
 unknown-argument: "<red>Unknown argument.</red>"
 config-reload: "<aqua>Configuration files have been reloaded.</aqua>"

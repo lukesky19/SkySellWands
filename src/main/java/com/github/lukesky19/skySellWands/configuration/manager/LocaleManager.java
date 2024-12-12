@@ -23,6 +23,7 @@ import com.github.lukesky19.skySellWands.configuration.record.Settings;
 import com.github.lukesky19.skylib.config.ConfigurationUtility;
 import com.github.lukesky19.skylib.format.FormatUtil;
 import com.github.lukesky19.skylib.libs.configurate.ConfigurateException;
+import com.github.lukesky19.skylib.libs.configurate.ConfigurationNode;
 import com.github.lukesky19.skylib.libs.configurate.yaml.YamlConfigurationLoader;
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
 
@@ -36,7 +37,7 @@ public class LocaleManager {
 
     Locale locale;
     private final Locale DEFAULT_LOCALE = new Locale(
-            "1.0.0",
+            "1.1.0",
             "<aqua><bold>SkySellWands</bold></aqua><gray> ▪ </gray>",
             List.of(
                     "<aqua>SkySellWands is developed by <white><bold>lukeskywlker19</bold></white>.</aqua>",
@@ -45,7 +46,7 @@ public class LocaleManager {
                     "<aqua><bold>List of Commands:</bold></aqua>",
                     "<white>/<aqua>sellwand</aqua> <yellow>help</yellow></white>",
                     "<white>/<aqua>sellwand</aqua> <yellow>reload</yellow></white>",
-                    "<white>/<aqua>sellwand</aqua> <yellow>give</yellow> <yellow>(player_name)</yellow> <yellow>(uses)</yellow></white>"),
+                    "<white>/<aqua>sellwand</aqua> <yellow>give</yellow> <yellow><player_name></yellow> <yellow><# of uses | unlimited | infinite | inf></yellow> <yellow><amount></yellow></white>"),
             "<red>You do not have permission for this command.</red>",
             "<red>Unknown argument.</red>",
             "<aqua>Configuration files have been reloaded.</aqua>",
@@ -103,6 +104,7 @@ public class LocaleManager {
                 throw new RuntimeException(e);
             }
 
+            migrateLocale();
             checkLocale();
         }
     }
@@ -142,6 +144,58 @@ public class LocaleManager {
             locale = null;
 
             logger.warn(FormatUtil.format("<yellow>Your locale configuration is invalid. The plugin will use an internal locale instead."));
+        }
+    }
+
+    private void migrateLocale() {
+        if(locale == null) return;
+
+        switch(locale.configVersion()) {
+            case "1.1.0" -> {
+                // Current version, do nothing
+            }
+
+            case "1.0.0" -> {
+                List<String> help = locale.help();
+                help.removeLast();
+                help.add("<white>/<aqua>sellwand</aqua> <yellow>give</yellow> <yellow><player_name></yellow> " +
+                        "<yellow><# of uses | unlimited | infinite | inf></yellow> <yellow><amount></yellow></white>");
+
+                locale = new Locale(
+                        "1.1.0",
+                        locale.prefix(), help,
+                        locale.noPermission(),
+                        locale.unknownArgument(),
+                        locale.configReload(),
+                        locale.invalidPlayer(),
+                        locale.invalidUses(),
+                        locale.invalidAmount(),
+                        locale.givenWand(),
+                        locale.sellSuccess(),
+                        locale.containerInventoryEmpty(),
+                        locale.noItemsSold(),
+                        locale.wandUsedUp());
+
+                saveLocale(locale);
+            }
+        }
+    }
+
+    private void saveLocale(Locale locale) {
+        Settings settings = settingsManager.getSettings();
+        if(settings == null) return;
+
+        String localeString = settings.locale();
+        Path path = Path.of(skySellWands.getDataFolder() + File.separator + "locale" + File.separator + (localeString + ".yml"));
+
+        YamlConfigurationLoader loader = ConfigurationUtility.getYamlConfigurationLoader(path);
+        ConfigurationNode node = loader.createNode();
+
+        try {
+            node.set(locale);
+            loader.save(node);
+        } catch (ConfigurateException e) {
+            throw new RuntimeException(e);
         }
     }
 }

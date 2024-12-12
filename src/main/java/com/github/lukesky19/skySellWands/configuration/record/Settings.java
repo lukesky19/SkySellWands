@@ -24,5 +24,5 @@ import java.util.List;
 @ConfigSerializable
 public record Settings(String configVersion, String locale, Item item) {
     @ConfigSerializable
-    public record Item(String material, String name, List<String> lore, String rarity, boolean enchanted) {}
+    public record Item(String material, String name, List<String> lore, boolean enchanted) {}
 }

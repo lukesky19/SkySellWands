@@ -9,14 +9,14 @@
 - /skysellwand - Command to open the shop.
   - Alias:
     - /sellwand
-- /skysellwand give <player_name> <# of uses> <amount> - Gives a player a sellwand with the defined uses and amount.
+- /skysellwand give <player_name> <# of uses | unlimited | infinite | inf> <amount> - Gives a player a sellwand with the defined uses and amount.
 - /skysellwand reload - Reloads the plugin.
 - /skysellwand help - Displays the help message.
 ## Permisisons
 - `skysellwands.commands.skysellwand` - The permission to access the /skysellwand base command.
-- `skysellwands.commands.skysellwand.give` - The permission to use /skysellwand give.
-- `skysellwands.commands.skysellwand.help` - The permission to use /skysellwand help.
-- `skysellwands.commands.skysellwand.reload` The permission to access /skysellwand reload.
+- `skysellwands.commands.skysellwands.give` - The permission to use /skysellwand give.
+- `skysellwands.commands.skysellwands.help` - The permission to use /skysellwand help.
+- `skysellwands.commands.skysellwands.reload` The permission to access /skysellwand reload.
 ## Issues, Bugs, or Suggestions
 * Please create a new [Github Issue](https://github.com/lukesky19/SkySellWands/issues) with your issue, bug, or suggestion.
 * If an issue or bug, please post any relevant logs containing errors related to SkySellWands and your configuration files.

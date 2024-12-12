@@ -28,7 +28,6 @@ import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemRarity;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
@@ -47,7 +46,7 @@ public class WandManager {
     }
 
     /**
-     * Gives a sellwand to a player.
+     * Gives a sellwand to a player with a limited number of uses.
      * @param player The player to give the sellwand to.
      * @param uses The number of uses for this sellwand.
      * @param amount The number of sellwands to give.
@@ -81,8 +80,58 @@ public class WandManager {
         @NotNull PersistentDataContainer pdc = itemMeta.getPersistentDataContainer();
         pdc.set(WandKeys.USES.getKey(), PersistentDataType.INTEGER, uses);
 
-        // Set the item's rarity
-        itemMeta.setRarity(ItemRarity.valueOf(settings.item().rarity()));
+        // Set if the item is enchanted or not
+        itemMeta.setEnchantmentGlintOverride(settings.item().enchanted());
+
+        itemMeta.setMaxStackSize(1);
+
+        // Set the item's ItemMeta
+        itemStack.setItemMeta(itemMeta);
+
+        // Set the number of sellwands to give.
+        itemStack.setAmount(amount);
+
+        // Give the Player the item.
+        PlayerUtil.giveItem(player, itemStack, amount);
+
+        // Send the player a message that a sellwand was given
+        player.sendMessage(FormatUtil.format(locale.prefix() + locale.givenWand(), placeholders));
+    }
+
+    /**
+     * Gives a sellwand to a player with an unlimited number of uses.
+     * @param player The player to give the sellwand to.
+     * @param amount The number of sellwands to give.
+     */
+    public void giveUnlimitedWand(Player player, int amount) {
+        // Get the plugin's settings
+        Locale locale = localeManager.getLocale();
+        Settings settings = settingsManager.getSettings();
+        if(settings == null) return;
+
+        // Get the configured material
+        Material material = Material.getMaterial(settings.item().material());
+        if(material == null) return;
+
+        // Create the ItemStack
+        ItemStack itemStack = new ItemStack(material);
+        // Get the ItemMeta
+        ItemMeta itemMeta = itemStack.getItemMeta();
+
+        // Set the item name
+        if(settings.item().name() != null) {
+            itemMeta.displayName(FormatUtil.format(settings.item().name()));
+        }
+
+        // Set the lore
+        List<TagResolver.Single> placeholders = List.of(Placeholder.parsed("uses", "unlimited"));
+        List<Component> lore = settings.item().lore().stream().map(string -> FormatUtil.format(string, placeholders)).toList();
+        itemMeta.lore(lore);
+
+        // Save the number of uses to the PDC
+        @NotNull PersistentDataContainer pdc = itemMeta.getPersistentDataContainer();
+        pdc.set(WandKeys.USES.getKey(), PersistentDataType.INTEGER, -1);
+
         // Set if the item is enchanted or not
         itemMeta.setEnchantmentGlintOverride(settings.item().enchanted());
 
