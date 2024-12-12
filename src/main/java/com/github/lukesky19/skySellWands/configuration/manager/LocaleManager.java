@@ -37,7 +37,7 @@ public class LocaleManager {
 
     Locale locale;
     private final Locale DEFAULT_LOCALE = new Locale(
-            "1.0.0",
+            "1.1.0",
             "<aqua><bold>SkySellWands</bold></aqua><gray> ▪ </gray>",
             List.of(
                     "<aqua>SkySellWands is developed by <white><bold>lukeskywlker19</bold></white>.</aqua>",
