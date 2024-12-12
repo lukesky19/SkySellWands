@@ -99,15 +99,22 @@ public class SellWandCommand implements CommandExecutor, TabCompleter {
                         if(args[0].equalsIgnoreCase("give")) {
                             if(player.hasPermission("skysellwands.commands.skysellwands.give")) {
                                 Player target = skySellWands.getServer().getPlayer(args[1]);
+                                String arg3 = args[2].toLowerCase();
                                 int uses;
                                 int amount;
 
-                                try {
-                                    uses = Integer.parseInt(args[2]);
-                                } catch (NumberFormatException ignored) {
-                                    player.sendMessage(FormatUtil.format(locale.prefix() + locale.invalidUses()));
+                                if(arg3.equals("unlimited")
+                                        || arg3.equals("infinite")
+                                        || arg3.equals("inf")) {
+                                    uses = -1;
+                                } else {
+                                    try {
+                                        uses = Integer.parseInt(args[2]);
+                                    } catch (NumberFormatException ignored) {
+                                        player.sendMessage(FormatUtil.format(locale.invalidUses()));
 
-                                    return false;
+                                        return false;
+                                    }
                                 }
 
                                 try {
@@ -119,7 +126,11 @@ public class SellWandCommand implements CommandExecutor, TabCompleter {
                                 }
 
                                 if(target != null && target.isOnline() && target.isConnected()) {
-                                    wandManager.giveWand(target, uses, amount);
+                                    if(uses == -1) {
+                                        wandManager.giveUnlimitedWand(target, amount);
+                                    } else {
+                                        wandManager.giveWand(target, uses, amount);
+                                    }
 
                                     return true;
                                 } else {
@@ -187,15 +198,22 @@ public class SellWandCommand implements CommandExecutor, TabCompleter {
                     // 3 -> amount
                     if(args[0].equalsIgnoreCase("give")) {
                         Player target = skySellWands.getServer().getPlayer(args[1]);
+                        String arg3 = args[2].toLowerCase();
                         int uses;
                         int amount;
 
-                        try {
-                            uses = Integer.parseInt(args[2]);
-                        } catch (NumberFormatException ignored) {
-                            logger.info(FormatUtil.format(locale.invalidUses()));
+                        if(arg3.equals("unlimited")
+                                || arg3.equals("infinite")
+                                || arg3.equals("inf")) {
+                            uses = -1;
+                        } else {
+                            try {
+                                uses = Integer.parseInt(args[2]);
+                            } catch (NumberFormatException ignored) {
+                                logger.info(FormatUtil.format(locale.invalidUses()));
 
-                            return false;
+                                return false;
+                            }
                         }
 
                         try {
@@ -207,7 +225,11 @@ public class SellWandCommand implements CommandExecutor, TabCompleter {
                         }
 
                         if(target != null && target.isOnline() && target.isConnected()) {
-                            wandManager.giveWand(target, uses, amount);
+                            if(uses == -1) {
+                                wandManager.giveUnlimitedWand(target, amount);
+                            } else {
+                                wandManager.giveWand(target, uses, amount);
+                            }
 
                             return true;
                         } else {
@@ -238,7 +260,7 @@ public class SellWandCommand implements CommandExecutor, TabCompleter {
         if(sender instanceof Player) {
             switch (args.length) {
                 case 1 -> {
-                    if (sender.hasPermission("skysellwands.commands.skysellwand.give")) subCmds.add("give");
+                    if (sender.hasPermission("skysellwands.commands.skysellwands.give")) subCmds.add("give");
                     if (sender.hasPermission("skysellwands.commands.skysellwands.help")) subCmds.add("help");
                     if (sender.hasPermission("skysellwands.commands.skysellwands.reload")) subCmds.add("reload");
                 }
