@@ -3,7 +3,7 @@ plugins {
 }
 
 group = "com.github.lukesky19"
-version = "1.1.0"
+version = "1.2.0"
 
 repositories {
     mavenCentral()
@@ -16,6 +16,10 @@ repositories {
         name = "jitpack"
     }
 
+    maven("https://repo.codemc.org/repository/maven-public/")
+
+    maven("https://maven.enginehub.org/repo/")
+
     mavenLocal()
 }
 
@@ -24,6 +28,11 @@ dependencies {
     compileOnly("com.github.MilkBowl:VaultAPI:1.7")
     compileOnly("com.github.lukesky19:SkyLib:1.1.0")
     compileOnly("com.github.lukesky19:SkyShop:2.0.0-Pre-Release-2")
+
+    // Hooks
+    compileOnly("dev.rosewood:rosestacker:1.5.30")
+    compileOnly("world.bentobox:bentobox:2.6.0-SNAPSHOT")
+    compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.11")
 }
 
 java {

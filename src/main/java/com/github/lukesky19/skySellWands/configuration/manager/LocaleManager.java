@@ -37,7 +37,7 @@ public class LocaleManager {
 
     Locale locale;
     private final Locale DEFAULT_LOCALE = new Locale(
-            "1.1.0",
+            "1.2.0",
             "<aqua><bold>SkySellWands</bold></aqua><gray> ▪ </gray>",
             List.of(
                     "<aqua>SkySellWands is developed by <white><bold>lukeskywlker19</bold></white>.</aqua>",
@@ -57,7 +57,8 @@ public class LocaleManager {
             "<white>Sold all items in the container. Balance: <yellow><bal></yellow></white>",
             "<red>No items were sold as the container's inventory is empty.</red>",
             "<red>No items were sold as the container's inventory contained no items that could be sold.</red>",
-            "<dark_purple>POOF!</dark_purple> <red>Your sellwand ran out of uses.</red>");
+            "<dark_purple>POOF!</dark_purple> <red>Your sellwand ran out of uses.</red>",
+            "<red>You do not have access to this container to sell the items inside.</red>");
 
     /**
      * Constructor
@@ -140,7 +141,8 @@ public class LocaleManager {
                 || locale.sellSuccess() == null
                 || locale.containerInventoryEmpty() == null
                 || locale.noItemsSold() == null
-                || locale.wandUsedUp() == null) {
+                || locale.wandUsedUp() == null
+                || locale.noAccess() == null) {
             locale = null;
 
             logger.warn(FormatUtil.format("<yellow>Your locale configuration is invalid. The plugin will use an internal locale instead."));
@@ -151,8 +153,30 @@ public class LocaleManager {
         if(locale == null) return;
 
         switch(locale.configVersion()) {
+            case "1.2.0" -> {
+                // Current version, do nothing
+            }
+
             case "1.1.0" -> {
                 // Current version, do nothing
+                locale = new Locale(
+                        "1.2.0",
+                        locale.prefix(),
+                        locale.help(),
+                        locale.noPermission(),
+                        locale.unknownArgument(),
+                        locale.configReload(),
+                        locale.invalidPlayer(),
+                        locale.invalidUses(),
+                        locale.invalidAmount(),
+                        locale.givenWand(),
+                        locale.sellSuccess(),
+                        locale.containerInventoryEmpty(),
+                        locale.noItemsSold(),
+                        locale.wandUsedUp(),
+                        "<red>You do not have access to this container to sell the items inside.</red>");
+
+                saveLocale(locale);
             }
 
             case "1.0.0" -> {
@@ -162,7 +186,7 @@ public class LocaleManager {
                         "<yellow><# of uses | unlimited | infinite | inf></yellow> <yellow><amount></yellow></white>");
 
                 locale = new Locale(
-                        "1.1.0",
+                        "1.2.0",
                         locale.prefix(), help,
                         locale.noPermission(),
                         locale.unknownArgument(),
@@ -174,7 +198,8 @@ public class LocaleManager {
                         locale.sellSuccess(),
                         locale.containerInventoryEmpty(),
                         locale.noItemsSold(),
-                        locale.wandUsedUp());
+                        locale.wandUsedUp(),
+                        "<red>You do not have access to this container to sell the items inside.</red>");
 
                 saveLocale(locale);
             }
