@@ -68,8 +68,6 @@ public class HookManager {
                 if (!hook.canPlayerOpen(player, location))
                     return false;
             }
-
-
         }
 
         return false;

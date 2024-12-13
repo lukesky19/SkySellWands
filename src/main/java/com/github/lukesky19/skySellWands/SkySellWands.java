@@ -21,7 +21,6 @@ import com.github.lukesky19.skySellWands.command.SellWandCommand;
 import com.github.lukesky19.skySellWands.configuration.manager.LocaleManager;
 import com.github.lukesky19.skySellWands.configuration.manager.SettingsManager;
 import com.github.lukesky19.skySellWands.listener.PlayerClickListener;
-import com.github.lukesky19.skySellWands.listener.ShopCreationListener;
 import com.github.lukesky19.skySellWands.manager.HookManager;
 import com.github.lukesky19.skySellWands.manager.WandManager;
 import com.github.lukesky19.skylib.format.FormatUtil;
