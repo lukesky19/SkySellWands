@@ -27,7 +27,7 @@ dependencies {
     compileOnly("io.papermc.paper:paper-api:1.21-R0.1-SNAPSHOT")
     compileOnly("com.github.MilkBowl:VaultAPI:1.7")
     compileOnly("com.github.lukesky19:SkyLib:1.1.0")
-    compileOnly("com.github.lukesky19:SkyShop:2.0.0-Pre-Release-2")
+    compileOnly("com.github.lukesky19:SkyShop:2.0.0-Pre-Release-3")
 
     // Hooks
     compileOnly("world.bentobox:bentobox:2.6.0-SNAPSHOT")

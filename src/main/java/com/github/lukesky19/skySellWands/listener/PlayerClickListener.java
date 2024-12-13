@@ -98,7 +98,7 @@ public class PlayerClickListener implements Listener {
                         // Check if the container's inventory is not empty
                         if (!container.getInventory().isEmpty()) {
                             // Sell the container's inventory of items
-                            boolean result = skySellWands.getSkyShopAPI().sellInventory(player, inventory);
+                            boolean result = skySellWands.getSkyShopAPI().sellInventory(player, inventory, false);
 
                             // If at least one item was sold, send a success message
                             if (result) {
