@@ -20,7 +20,10 @@ package com.github.lukesky19.skySellWands;
 import com.github.lukesky19.skySellWands.command.SellWandCommand;
 import com.github.lukesky19.skySellWands.configuration.manager.LocaleManager;
 import com.github.lukesky19.skySellWands.configuration.manager.SettingsManager;
+import com.github.lukesky19.skySellWands.listener.ItemSoldListener;
 import com.github.lukesky19.skySellWands.listener.PlayerClickListener;
+import com.github.lukesky19.skySellWands.listener.ShopCreationListener;
+import com.github.lukesky19.skySellWands.manager.HookManager;
 import com.github.lukesky19.skySellWands.manager.WandManager;
 import com.github.lukesky19.skylib.format.FormatUtil;
 import com.github.lukesky19.skyshop.SkyShopAPI;
@@ -33,6 +36,7 @@ import org.jetbrains.annotations.Nullable;
 public final class SkySellWands extends JavaPlugin {
     private SettingsManager settingsManager;
     private LocaleManager localeManager;
+    private HookManager hookManager;
     private SkyShopAPI skyShopAPI;
     private Economy economy;
 
@@ -51,14 +55,17 @@ public final class SkySellWands extends JavaPlugin {
         setupSkyShopAPI();
 
         // Create class instances
+        hookManager = new HookManager(this);
         settingsManager = new SettingsManager(this);
         localeManager = new LocaleManager(this, settingsManager);
         WandManager wandManager = new WandManager(settingsManager, localeManager);
-        PlayerClickListener playerClickListener = new PlayerClickListener(this, settingsManager, localeManager);
+        PlayerClickListener playerClickListener = new PlayerClickListener(this, settingsManager, localeManager, hookManager);
         SellWandCommand sellWandCommand = new SellWandCommand(this, localeManager, wandManager);
 
         // Register Listener
         this.getServer().getPluginManager().registerEvents(playerClickListener, this);
+        this.getServer().getPluginManager().registerEvents(new ShopCreationListener(), this);
+        this.getServer().getPluginManager().registerEvents(new ItemSoldListener(), this);
 
         // Register Command Executor and TabCompleter
         PluginCommand skySellWands = this.getServer().getPluginCommand("skysellwands");
@@ -77,6 +84,7 @@ public final class SkySellWands extends JavaPlugin {
     public void reload() {
         settingsManager.reload();
         localeManager.reload();
+        hookManager.reload();
     }
 
     /**

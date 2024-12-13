@@ -3,6 +3,7 @@ version: '1.0.0'
 main: com.github.lukesky19.skySellWands.SkySellWands
 api-version: '1.21'
 depend: [SkyLib, SkyShop, Vault]
+soft-depend: [QuickShop-Hikari]
 
 commands:
     skysellwands:
