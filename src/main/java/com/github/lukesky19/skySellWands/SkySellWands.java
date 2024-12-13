@@ -21,6 +21,7 @@ import com.github.lukesky19.skySellWands.command.SellWandCommand;
 import com.github.lukesky19.skySellWands.configuration.manager.LocaleManager;
 import com.github.lukesky19.skySellWands.configuration.manager.SettingsManager;
 import com.github.lukesky19.skySellWands.listener.PlayerClickListener;
+import com.github.lukesky19.skySellWands.listener.ShopCreationListener;
 import com.github.lukesky19.skySellWands.manager.HookManager;
 import com.github.lukesky19.skySellWands.manager.WandManager;
 import com.github.lukesky19.skylib.format.FormatUtil;
@@ -62,6 +63,7 @@ public final class SkySellWands extends JavaPlugin {
 
         // Register Listener
         this.getServer().getPluginManager().registerEvents(playerClickListener, this);
+        this.getServer().getPluginManager().registerEvents(new ShopCreationListener(), this);
 
         // Register Command Executor and TabCompleter
         PluginCommand skySellWands = this.getServer().getPluginCommand("skysellwands");
