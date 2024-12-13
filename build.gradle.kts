@@ -30,11 +30,9 @@ dependencies {
     compileOnly("com.github.lukesky19:SkyShop:2.0.0-Pre-Release-2")
 
     // Hooks
-    compileOnly("dev.rosewood:rosestacker:1.5.30")
     compileOnly("world.bentobox:bentobox:2.6.0-SNAPSHOT")
     compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.11")
     compileOnly("com.ghostchu:quickshop-api:6.2.0.6")
-
 }
 
 java {
