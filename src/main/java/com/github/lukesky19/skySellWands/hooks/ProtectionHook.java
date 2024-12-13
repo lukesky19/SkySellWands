@@ -1,5 +1,5 @@
 /*
-    SkySellWands adds sell wands that uses SkyShop's API selling.
+    SkyHoppers adds upgradable hoppers that can suction items, transfer items wirelessly to linked containers.
     Copyright (C) 2024  lukeskywlker19
 
     This program is free software: you can redistribute it and/or modify
@@ -15,23 +15,17 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-package com.github.lukesky19.skySellWands.configuration.record;
+package com.github.lukesky19.skySellWands.hooks;
 
-import java.util.List;
+import org.bukkit.Location;
+import org.bukkit.entity.Player;
 
-public record Locale(
-        String configVersion,
-        String prefix,
-        List<String> help,
-        String noPermission,
-        String unknownArgument,
-        String configReload,
-        String invalidPlayer,
-        String invalidUses,
-        String invalidAmount,
-        String givenWand,
-        String sellSuccess,
-        String containerInventoryEmpty,
-        String noItemsSold,
-        String wandUsedUp,
-        String noAccess) {}
+public interface ProtectionHook {
+    /**
+     * Can the Player open containers at the given Location?
+     * @param player   The Player who is attempting to access the container.
+     * @param location The Location of the container that is being accessed.
+     * @return true If the Player can open the container.
+     */
+    boolean canPlayerOpen(Player player, Location location);
+}

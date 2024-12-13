@@ -22,6 +22,7 @@ import com.github.lukesky19.skySellWands.configuration.manager.LocaleManager;
 import com.github.lukesky19.skySellWands.configuration.manager.SettingsManager;
 import com.github.lukesky19.skySellWands.configuration.record.Locale;
 import com.github.lukesky19.skySellWands.configuration.record.Settings;
+import com.github.lukesky19.skySellWands.manager.HookManager;
 import com.github.lukesky19.skySellWands.manager.WandKeys;
 import com.github.lukesky19.skylib.format.FormatUtil;
 import net.kyori.adventure.text.Component;
@@ -46,11 +47,13 @@ public class PlayerClickListener implements Listener {
     private final SkySellWands skySellWands;
     private final SettingsManager settingsManager;
     private final LocaleManager localeManager;
+    private final HookManager hookManager;
 
-    public PlayerClickListener(SkySellWands skySellWands, SettingsManager settingsManager, LocaleManager localeManager) {
+    public PlayerClickListener(SkySellWands skySellWands, SettingsManager settingsManager, LocaleManager localeManager, HookManager hookManager) {
         this.skySellWands = skySellWands;
         this.localeManager = localeManager;
         this.settingsManager = settingsManager;
+        this.hookManager = hookManager;
     }
 
     @EventHandler
@@ -80,6 +83,12 @@ public class PlayerClickListener implements Listener {
                     PersistentDataContainer pdc = itemMeta.getPersistentDataContainer();
                     // Check if it is a sellwand
                     if (pdc.has(WandKeys.USES.getKey())) {
+                        // Check if the player can access the container before selling
+                        if(hookManager.canNotOpen(player, block.getLocation())) {
+                            player.sendMessage(FormatUtil.format(locale.prefix() + locale.noAccess()));
+                            return;
+                        }
+
                         // Get the wand's uses
                         Integer uses = pdc.get(WandKeys.USES.getKey(), PersistentDataType.INTEGER);
                         if (uses == null) return; // Should never be null here, but just in-case we return if it is.

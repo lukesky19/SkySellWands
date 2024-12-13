@@ -1,4 +1,4 @@
-config-version: 1.1.0
+config-version: 1.2.0
 prefix: "<aqua><bold>SkySellWands</bold></aqua><gray> ▪ </gray>"
 help:
     - "<aqua>SkySellWands is developed by <white><bold>lukeskywlker19</bold></white>.</aqua>"
@@ -21,3 +21,4 @@ sell-success: "<white>Sold all items in the container. Balance: <yellow><bal></y
 container-inventory-empty: "<red>No items were sold as the container's inventory is empty.</red>"
 no-items-sold: "<red>No items were sold as the container's inventory contained no items that could be sold.</red>"
 wand-used-up: "<dark_purple>POOF!</dark_purple> <red>Your sellwand ran out of uses.</red>"
+no-access: "<red>You do not have access to this container to sell the items inside.</red>"
