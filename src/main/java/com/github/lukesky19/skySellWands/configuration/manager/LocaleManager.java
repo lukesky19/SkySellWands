@@ -228,6 +228,8 @@ public class LocaleManager {
 
                 saveLocale(locale);
             }
+
+            default -> throw new IllegalStateException("Unexpected value: " + locale.configVersion());
         }
     }
 
