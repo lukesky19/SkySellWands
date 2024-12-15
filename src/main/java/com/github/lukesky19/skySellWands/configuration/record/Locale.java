@@ -17,8 +17,11 @@
 */
 package com.github.lukesky19.skySellWands.configuration.record;
 
+import com.github.lukesky19.skylib.libs.configurate.objectmapping.ConfigSerializable;
+
 import java.util.List;
 
+@ConfigSerializable
 public record Locale(
         String configVersion,
         String prefix,
