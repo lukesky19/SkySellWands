@@ -27,6 +27,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.Material;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -47,11 +48,12 @@ public class WandManager {
 
     /**
      * Gives a sellwand to a player with a limited number of uses.
-     * @param player The player to give the sellwand to.
+     * @param sender The CommandSender who ran the command to give a sellwand to the target.
+     * @param target The player to give the sellwand to.
      * @param uses The number of uses for this sellwand.
      * @param amount The number of sellwands to give.
      */
-    public void giveWand(Player player, int uses, int amount) {
+    public void giveWand(CommandSender sender, Player target, int uses, int amount) {
         // Get the plugin's settings
         Locale locale = localeManager.getLocale();
         Settings settings = settingsManager.getSettings();
@@ -72,7 +74,7 @@ public class WandManager {
         }
 
         // Set the lore
-        List<TagResolver.Single> placeholders = List.of(Placeholder.parsed("uses", String.valueOf(uses)));
+        List<TagResolver.Single> placeholders = List.of(Placeholder.parsed("uses", String.valueOf(uses)), Placeholder.parsed("player_name", target.getName()));
         List<Component> lore = settings.item().lore().stream().map(string -> FormatUtil.format(string, placeholders)).toList();
         itemMeta.lore(lore);
 
@@ -91,19 +93,23 @@ public class WandManager {
         // Set the number of sellwands to give.
         itemStack.setAmount(amount);
 
-        // Give the Player the item.
-        PlayerUtil.giveItem(player, itemStack, amount);
+        // Give the target the item.
+        PlayerUtil.giveItem(target, itemStack, amount);
 
-        // Send the player a message that a sellwand was given
-        player.sendMessage(FormatUtil.format(locale.prefix() + locale.givenWand(), placeholders));
+        // Send the target a message that a sellwand was given
+        target.sendMessage(FormatUtil.format(locale.prefix() + locale.givenWand(), placeholders));
+
+        // Send the sender a message that a sellwand was given
+        sender.sendMessage(FormatUtil.format(locale.prefix() + locale.playerGivenWand(), placeholders));
     }
 
     /**
      * Gives a sellwand to a player with an unlimited number of uses.
-     * @param player The player to give the sellwand to.
+     * @param sender The CommandSender who ran the command to give a sellwand to the target.
+     * @param target The player to give the sellwand to.
      * @param amount The number of sellwands to give.
      */
-    public void giveUnlimitedWand(Player player, int amount) {
+    public void giveUnlimitedWand(CommandSender sender, Player target, int amount) {
         // Get the plugin's settings
         Locale locale = localeManager.getLocale();
         Settings settings = settingsManager.getSettings();
@@ -124,7 +130,7 @@ public class WandManager {
         }
 
         // Set the lore
-        List<TagResolver.Single> placeholders = List.of(Placeholder.parsed("uses", "unlimited"));
+        List<TagResolver.Single> placeholders = List.of(Placeholder.parsed("uses", "unlimited"), Placeholder.parsed("player_name", target.getName()));
         List<Component> lore = settings.item().lore().stream().map(string -> FormatUtil.format(string, placeholders)).toList();
         itemMeta.lore(lore);
 
@@ -143,10 +149,13 @@ public class WandManager {
         // Set the number of sellwands to give.
         itemStack.setAmount(amount);
 
-        // Give the Player the item.
-        PlayerUtil.giveItem(player, itemStack, amount);
+        // Give the target the item.
+        PlayerUtil.giveItem(target, itemStack, amount);
 
-        // Send the player a message that a sellwand was given
-        player.sendMessage(FormatUtil.format(locale.prefix() + locale.givenWand(), placeholders));
+        // Send the target a message that a sellwand was given
+        target.sendMessage(FormatUtil.format(locale.prefix() + locale.givenWand(), placeholders));
+
+        // Send the sender a message that a sellwand was given
+        sender.sendMessage(FormatUtil.format(locale.prefix() + locale.playerGivenWand(), placeholders));
     }
 }

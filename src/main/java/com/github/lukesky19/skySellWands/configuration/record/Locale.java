@@ -30,6 +30,7 @@ public record Locale(
         String invalidUses,
         String invalidAmount,
         String givenWand,
+        String playerGivenWand,
         String sellSuccess,
         String containerInventoryEmpty,
         String noItemsSold,

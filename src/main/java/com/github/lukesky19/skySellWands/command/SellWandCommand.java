@@ -127,9 +127,9 @@ public class SellWandCommand implements CommandExecutor, TabCompleter {
 
                                 if(target != null && target.isOnline() && target.isConnected()) {
                                     if(uses == -1) {
-                                        wandManager.giveUnlimitedWand(target, amount);
+                                        wandManager.giveUnlimitedWand(sender, target, amount);
                                     } else {
-                                        wandManager.giveWand(target, uses, amount);
+                                        wandManager.giveWand(sender, target, uses, amount);
                                     }
 
                                     return true;
@@ -226,9 +226,9 @@ public class SellWandCommand implements CommandExecutor, TabCompleter {
 
                         if(target != null && target.isOnline() && target.isConnected()) {
                             if(uses == -1) {
-                                wandManager.giveUnlimitedWand(target, amount);
+                                wandManager.giveUnlimitedWand(sender, target, amount);
                             } else {
-                                wandManager.giveWand(target, uses, amount);
+                                wandManager.giveWand(sender, target, uses, amount);
                             }
 
                             return true;

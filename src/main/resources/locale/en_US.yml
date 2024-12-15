@@ -1,4 +1,4 @@
-config-version: 1.2.0
+config-version: 1.2.1
 prefix: "<aqua><bold>SkySellWands</bold></aqua><gray> ▪ </gray>"
 help:
     - "<aqua>SkySellWands is developed by <white><bold>lukeskywlker19</bold></white>.</aqua>"
@@ -16,6 +16,7 @@ invalid-uses: "<red>The number of uses provided is not a valid integer.</red>"
 invalid-amount: "<red>The amount of sellwands to give is not a valid integer.</red>"
 # Placeholders: <uses>
 given-wand: "<aqua>You have been given a sellwand with <yellow><uses></yellow> uses.</aqua>"
+player-given-wand: "<aqua>You have given a sellwand with <yellow><uses></yellow> uses to <yellow><player_name></yellow>.</aqua>"
 # Placeholders: <bal>
 sell-success: "<white>Sold all items in the container. Balance: <yellow><bal></yellow></white>"
 container-inventory-empty: "<red>No items were sold as the container's inventory is empty.</red>"
