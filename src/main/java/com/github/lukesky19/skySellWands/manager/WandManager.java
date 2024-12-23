@@ -92,7 +92,7 @@ public class WandManager {
         itemStack.setAmount(amount);
 
         // Give the Player the item.
-        PlayerUtil.giveItem(player, itemStack, amount);
+        PlayerUtil.giveItem(player.getInventory(), itemStack, amount, player.getLocation());
 
         // Send the player a message that a sellwand was given
         player.sendMessage(FormatUtil.format(locale.prefix() + locale.givenWand(), placeholders));
@@ -144,7 +144,7 @@ public class WandManager {
         itemStack.setAmount(amount);
 
         // Give the Player the item.
-        PlayerUtil.giveItem(player, itemStack, amount);
+        PlayerUtil.giveItem(player.getInventory(), itemStack, amount, player.getLocation());
 
         // Send the player a message that a sellwand was given
         player.sendMessage(FormatUtil.format(locale.prefix() + locale.givenWand(), placeholders));
