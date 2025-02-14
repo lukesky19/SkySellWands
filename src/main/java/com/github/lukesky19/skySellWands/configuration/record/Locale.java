@@ -17,18 +17,16 @@
 */
 package com.github.lukesky19.skySellWands.configuration.record;
 
+import com.github.lukesky19.skylib.libs.configurate.objectmapping.ConfigSerializable;
+
 import java.util.List;
 
+@ConfigSerializable
 public record Locale(
         String configVersion,
         String prefix,
         List<String> help,
-        String noPermission,
-        String unknownArgument,
         String configReload,
-        String invalidPlayer,
-        String invalidUses,
-        String invalidAmount,
         String givenWand,
         String sellSuccess,
         String containerInventoryEmpty,

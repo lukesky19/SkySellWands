@@ -122,6 +122,7 @@ public final class SkySellWands extends JavaPlugin {
             @Nullable RegisteredServiceProvider<SkyShopAPI> rsp = this.getServer().getServicesManager().getRegistration(SkyShopAPI.class);
             if (rsp != null) {
                 skyShopAPI = rsp.getProvider();
+
                 return true;
             }
         }

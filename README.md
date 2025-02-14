@@ -13,7 +13,7 @@
 - /skysellwand - Command to open the shop.
   - Alias:
     - /sellwand
-- /skysellwand give <player_name> <# of uses | unlimited | infinite | inf> <amount> - Gives a player a sellwand with the defined uses and amount.
+- /skysellwand give <player_name> <# of uses> <amount> - Gives a player a sellwand with the defined uses and amount.
 - /skysellwand reload - Reloads the plugin.
 - /skysellwand help - Displays the help message.
 ## Permisisons

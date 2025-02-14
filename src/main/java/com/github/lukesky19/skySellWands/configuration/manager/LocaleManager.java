@@ -35,7 +35,7 @@ public class LocaleManager {
     private final SkySellWands skySellWands;
     private final SettingsManager settingsManager;
 
-    Locale locale;
+    private Locale locale;
     private final Locale DEFAULT_LOCALE = new Locale(
             "1.2.0",
             "<aqua><bold>SkySellWands</bold></aqua><gray> ▪ </gray>",
@@ -46,13 +46,8 @@ public class LocaleManager {
                     "<aqua><bold>List of Commands:</bold></aqua>",
                     "<white>/<aqua>sellwand</aqua> <yellow>help</yellow></white>",
                     "<white>/<aqua>sellwand</aqua> <yellow>reload</yellow></white>",
-                    "<white>/<aqua>sellwand</aqua> <yellow>give</yellow> <yellow><player_name></yellow> <yellow><# of uses | unlimited | infinite | inf></yellow> <yellow><amount></yellow></white>"),
-            "<red>You do not have permission for this command.</red>",
-            "<red>Unknown argument.</red>",
+                    "<white>/<aqua>sellwand</aqua> <yellow>give</yellow> <yellow><player_name></yellow> <yellow><# of uses></yellow> <yellow><amount></yellow></white>"),
             "<aqua>Configuration files have been reloaded.</aqua>",
-            "<red>The player is invalid. Are they online?</red>",
-            "<red>The number of uses provided is not a valid integer.</red>",
-            "<red>The amount of sellwands to give is not a valid integer.</red>",
             "<aqua>You have been given a sellwand with <yellow><uses></yellow> uses.</aqua>",
             "<white>Sold all items in the container. Balance: <yellow><bal></yellow></white>",
             "<red>No items were sold as the container's inventory is empty.</red>",
@@ -131,12 +126,7 @@ public class LocaleManager {
         if (locale.configVersion() == null
                 || locale.prefix() == null
                 || locale.help() == null
-                || locale.noPermission() == null
-                || locale.unknownArgument() == null
                 || locale.configReload() == null
-                || locale.invalidPlayer() == null
-                || locale.invalidUses() == null
-                || locale.invalidAmount() == null
                 || locale.givenWand() == null
                 || locale.sellSuccess() == null
                 || locale.containerInventoryEmpty() == null
@@ -153,22 +143,42 @@ public class LocaleManager {
         if(locale == null) return;
 
         switch(locale.configVersion()) {
-            case "1.2.0" -> {
+            case "1.3.0" -> {
                 // Current version, do nothing
             }
 
-            case "1.1.0" -> {
-                // Current version, do nothing
+            case "1.2.0" -> {
+                // 1.2.0 -> 1.3.0
+                List<String> help = locale.help();
+                help.removeLast();
+                help.add("<white>/<aqua>sellwand</aqua> <yellow>give</yellow> <yellow><player_name></yellow> <yellow><# of uses></yellow> <yellow><amount></yellow></white>");
+
                 locale = new Locale(
-                        "1.2.0",
+                        "1.3.0",
                         locale.prefix(),
-                        locale.help(),
-                        locale.noPermission(),
-                        locale.unknownArgument(),
+                        help,
                         locale.configReload(),
-                        locale.invalidPlayer(),
-                        locale.invalidUses(),
-                        locale.invalidAmount(),
+                        locale.givenWand(),
+                        locale.sellSuccess(),
+                        locale.containerInventoryEmpty(),
+                        locale.noItemsSold(),
+                        locale.wandUsedUp(),
+                        locale.noAccess());
+
+                saveLocale(locale);
+            }
+
+            case "1.1.0" -> {
+                // 1.1.0 -> 1.3.0
+                List<String> help = locale.help();
+                help.removeLast();
+                help.add("<white>/<aqua>sellwand</aqua> <yellow>give</yellow> <yellow><player_name></yellow> <yellow><# of uses></yellow> <yellow><amount></yellow></white>");
+
+                locale = new Locale(
+                        "1.3.0",
+                        locale.prefix(),
+                        help,
+                        locale.configReload(),
                         locale.givenWand(),
                         locale.sellSuccess(),
                         locale.containerInventoryEmpty(),
@@ -180,20 +190,16 @@ public class LocaleManager {
             }
 
             case "1.0.0" -> {
+                // 1.0.0 -> 1.3.0
                 List<String> help = locale.help();
                 help.removeLast();
-                help.add("<white>/<aqua>sellwand</aqua> <yellow>give</yellow> <yellow><player_name></yellow> " +
-                        "<yellow><# of uses | unlimited | infinite | inf></yellow> <yellow><amount></yellow></white>");
+                help.add("<white>/<aqua>sellwand</aqua> <yellow>give</yellow> <yellow><player_name></yellow> <yellow><# of uses></yellow> <yellow><amount></yellow></white>");
 
                 locale = new Locale(
-                        "1.2.0",
-                        locale.prefix(), help,
-                        locale.noPermission(),
-                        locale.unknownArgument(),
+                        "1.3.0",
+                        locale.prefix(),
+                        help,
                         locale.configReload(),
-                        locale.invalidPlayer(),
-                        locale.invalidUses(),
-                        locale.invalidAmount(),
                         locale.givenWand(),
                         locale.sellSuccess(),
                         locale.containerInventoryEmpty(),

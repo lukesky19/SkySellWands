@@ -30,6 +30,7 @@ import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.command.brigadier.MessageComponentSerializer;
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
+import io.papermc.paper.command.brigadier.argument.resolvers.selector.PlayerSelectorArgumentResolver;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -78,7 +79,7 @@ public class SellWandCommand {
         
         builder.then(Commands.literal("give")
             .requires(ctx -> ctx.getSender().hasPermission("skysellwands.commands.skysellwands.give"))
-            .then(Commands.argument("player_name", ArgumentTypes.player())
+            .then(Commands.argument("player name", ArgumentTypes.player())
                 .then(Commands.argument("uses", IntegerArgumentType.integer())
                     .suggests((commandContext, suggestionsBuilder) -> {
                         Message message = MessageComponentSerializer.message().serialize(FormatUtil.format("<green>A value of -1 will set the sell wand to have infinite uses.</green>"));
@@ -88,7 +89,8 @@ public class SellWandCommand {
                     })
                     .then(Commands.argument("amount", IntegerArgumentType.integer())
                         .executes(ctx -> {
-                            Player player = ctx.getArgument("player_name", Player.class);
+                            final PlayerSelectorArgumentResolver targetResolver = ctx.getArgument("player name", PlayerSelectorArgumentResolver.class);
+                            final Player player = targetResolver.resolve(ctx.getSource()).getFirst();
                             int uses = ctx.getArgument("uses", int.class);
                             int amount = ctx.getArgument("amount", int.class);
 
