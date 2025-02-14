@@ -1,6 +1,6 @@
 package com.github.lukesky19.skySellWands.listener;
 
-import com.ghostchu.quickshop.api.event.ShopPreCreateEvent;
+import com.ghostchu.quickshop.api.event.modification.ShopPreCreateEvent;
 import com.github.lukesky19.skySellWands.manager.WandKeys;
 import com.github.lukesky19.skylib.format.FormatUtil;
 import org.bukkit.entity.Player;

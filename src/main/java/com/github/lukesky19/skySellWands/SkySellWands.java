@@ -27,11 +27,14 @@ import com.github.lukesky19.skySellWands.manager.HookManager;
 import com.github.lukesky19.skySellWands.manager.WandManager;
 import com.github.lukesky19.skylib.format.FormatUtil;
 import com.github.lukesky19.skyshop.SkyShopAPI;
+import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import net.milkbowl.vault.economy.Economy;
-import org.bukkit.command.PluginCommand;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public final class SkySellWands extends JavaPlugin {
     private SettingsManager settingsManager;
@@ -51,8 +54,10 @@ public final class SkySellWands extends JavaPlugin {
     @Override
     public void onEnable() {
         // Plugin startup logic
-        setupEconomy();
-        setupSkyShopAPI();
+        boolean econResult = setupEconomy();
+        if(!econResult) return;
+        boolean skyShopAPIResult = setupSkyShopAPI();
+        if(!skyShopAPIResult) return;
 
         // Create class instances
         hookManager = new HookManager(this);
@@ -64,15 +69,19 @@ public final class SkySellWands extends JavaPlugin {
 
         // Register Listener
         this.getServer().getPluginManager().registerEvents(playerClickListener, this);
-        this.getServer().getPluginManager().registerEvents(new ShopCreationListener(), this);
+
+        Plugin quickShop = this.getServer().getPluginManager().getPlugin("QuicKShop-Hikari");
+        if(quickShop != null && quickShop.isEnabled()) {
+            this.getServer().getPluginManager().registerEvents(new ShopCreationListener(), this);
+        }
+
         this.getServer().getPluginManager().registerEvents(new ItemSoldListener(), this);
 
-        // Register Command Executor and TabCompleter
-        PluginCommand skySellWands = this.getServer().getPluginCommand("skysellwands");
-        if(skySellWands != null) {
-            skySellWands.setExecutor(sellWandCommand);
-            skySellWands.setTabCompleter(sellWandCommand);
-        }
+        // Register Command
+        this.getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS,
+                commands -> commands.registrar().register(sellWandCommand.createCommand(),
+                        "Command to manage and use the SkySellWand plugin.",
+                        List.of("sellwand", "sellwands", "skysellwands")));
 
         // Reload the plugin
         reload();
@@ -90,34 +99,35 @@ public final class SkySellWands extends JavaPlugin {
     /**
      * Checks for Vault as a dependency and sets up the Economy instance.
      */
-    private void setupEconomy() {
-        if (getServer().getPluginManager().getPlugin("Vault") != null) {
+    private boolean setupEconomy() {
+        if(getServer().getPluginManager().getPlugin("Vault") != null) {
             RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
             if (rsp != null) {
                 this.economy = rsp.getProvider();
+
+                return true;
             }
         }
 
-        if(economy == null) {
-            this.getComponentLogger().error(FormatUtil.format("Failed to retrieve economy, disabling plugin."));
-            this.getServer().getPluginManager().disablePlugin(this);
-        }
+        this.getComponentLogger().error(FormatUtil.format("Failed to retrieve economy, disabling plugin."));
+        this.getServer().getPluginManager().disablePlugin(this);
+        return false;
     }
 
     /**
      * Checks for SkyShop as a dependency and gets SkyShop's API
      */
-    private void setupSkyShopAPI() {
+    private boolean setupSkyShopAPI() {
         if (this.getServer().getPluginManager().getPlugin("SkyShop") != null) {
             @Nullable RegisteredServiceProvider<SkyShopAPI> rsp = this.getServer().getServicesManager().getRegistration(SkyShopAPI.class);
             if (rsp != null) {
                 skyShopAPI = rsp.getProvider();
+                return true;
             }
         }
 
-        if(skyShopAPI == null) {
-            this.getComponentLogger().error(FormatUtil.format("Failed to retrieve SkyShop's API, disabling plugin."));
-            this.getServer().getPluginManager().disablePlugin(this);
-        }
+        this.getComponentLogger().error(FormatUtil.format("Failed to retrieve SkyShop's API, disabling plugin."));
+        this.getServer().getPluginManager().disablePlugin(this);
+        return false;
     }
 }

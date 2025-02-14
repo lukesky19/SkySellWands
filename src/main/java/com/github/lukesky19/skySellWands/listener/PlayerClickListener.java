@@ -83,6 +83,8 @@ public class PlayerClickListener implements Listener {
                     PersistentDataContainer pdc = itemMeta.getPersistentDataContainer();
                     // Check if it is a sellwand
                     if (pdc.has(WandKeys.USES.getKey())) {
+                        event.setCancelled(true);
+
                         // Check if the player can access the container before selling
                         if(!hookManager.canPlayerOpen(player, block.getLocation())) {
                             player.sendMessage(FormatUtil.format(locale.prefix() + locale.noAccess()));

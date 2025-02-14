@@ -22,19 +22,18 @@ import com.github.lukesky19.skySellWands.configuration.manager.LocaleManager;
 import com.github.lukesky19.skySellWands.configuration.record.Locale;
 import com.github.lukesky19.skySellWands.manager.WandManager;
 import com.github.lukesky19.skylib.format.FormatUtil;
-import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
+import com.mojang.brigadier.Message;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.tree.LiteralCommandNode;
+import io.papermc.paper.command.brigadier.CommandSourceStack;
+import io.papermc.paper.command.brigadier.Commands;
+import io.papermc.paper.command.brigadier.MessageComponentSerializer;
+import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class SellWandCommand implements CommandExecutor, TabCompleter {
+public class SellWandCommand {
     private final SkySellWands skySellWands;
     private final LocaleManager localeManager;
     private final WandManager wandManager;
@@ -45,254 +44,67 @@ public class SellWandCommand implements CommandExecutor, TabCompleter {
         this.wandManager = wandManager;
     }
 
-    @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        final Locale locale = localeManager.getLocale();
+    public LiteralCommandNode<CommandSourceStack> createCommand() {
+        LiteralArgumentBuilder<CommandSourceStack> builder = Commands.literal("skysellwand")
+                .requires(ctx -> ctx.getSender().hasPermission("skysellwands.commands.skysellwands"));
 
-        if(sender instanceof Player player) {
-            if(player.hasPermission("skysellwands.commands.skysellwands")) {
-                switch(args.length) {
-                    case 1 -> {
-                        // Help, Reload
-                        switch(args[0].toLowerCase()) {
-                            case "help" -> {
-                                if(player.hasPermission("skysellwands.commands.skysellwands.help")) {
-                                    for(String message : locale.help()) {
-                                        player.sendMessage(FormatUtil.format(message));
-                                    }
-
-                                    return true;
-                                } else {
-                                    player.sendMessage(FormatUtil.format(locale.prefix() + locale.noPermission()));
-
-                                    return false;
-                                }
-                            }
-
-                            case "reload" -> {
-                                if(player.hasPermission("skysellwands.commands.skysellwands.reload")) {
-                                    skySellWands.reload();
-
-                                    player.sendMessage(FormatUtil.format(locale.prefix() + locale.configReload()));
-
-                                    return true;
-                                } else {
-                                    player.sendMessage(FormatUtil.format(locale.prefix() + locale.noPermission()));
-
-                                    return false;
-                                }
-                            }
-
-                            default -> {
-                                player.sendMessage(FormatUtil.format(locale.prefix() + locale.unknownArgument()));
-
-                                return false;
-                            }
-                        }
-                    }
-
-                    case 4 -> {
-                        // 0 -> give
-                        // 1 -> player_name
-                        // 2 -> uses
-                        // 3 -> amount
-                        if(args[0].equalsIgnoreCase("give")) {
-                            if(player.hasPermission("skysellwands.commands.skysellwands.give")) {
-                                Player target = skySellWands.getServer().getPlayer(args[1]);
-                                String arg3 = args[2].toLowerCase();
-                                int uses;
-                                int amount;
-
-                                if(arg3.equals("unlimited")
-                                        || arg3.equals("infinite")
-                                        || arg3.equals("inf")) {
-                                    uses = -1;
-                                } else {
-                                    try {
-                                        uses = Integer.parseInt(args[2]);
-                                    } catch (NumberFormatException ignored) {
-                                        player.sendMessage(FormatUtil.format(locale.invalidUses()));
-
-                                        return false;
-                                    }
-                                }
-
-                                try {
-                                    amount = Integer.parseInt(args[3]);
-                                } catch (NumberFormatException ignored) {
-                                    player.sendMessage(FormatUtil.format(locale.prefix() + locale.invalidAmount()));
-
-                                    return false;
-                                }
-
-                                if(target != null && target.isOnline() && target.isConnected()) {
-                                    if(uses == -1) {
-                                        wandManager.giveUnlimitedWand(target, amount);
-                                    } else {
-                                        wandManager.giveWand(target, uses, amount);
-                                    }
-
-                                    return true;
-                                } else {
-                                    player.sendMessage(FormatUtil.format(locale.prefix() + locale.invalidPlayer()));
-
-                                    return false;
-                                }
-                            } else {
-                                player.sendMessage(FormatUtil.format(locale.prefix() + locale.noPermission()));
-
-                                return false;
-                            }
-                        } else {
-                            player.sendMessage(FormatUtil.format(locale.prefix() + locale.unknownArgument()));
-
-                            return false;
-                        }
-                    }
-
-                    default -> {
-                        player.sendMessage(FormatUtil.format(locale.prefix() + locale.unknownArgument()));
-
-                        return false;
-                    }
+        builder.then(Commands.literal("help")
+            .requires(ctx -> ctx.getSender().hasPermission("skysellwands.commands.skysellwands.help"))
+            .executes(ctx -> {
+                Locale locale = localeManager.getLocale();
+                
+                CommandSender sender = ctx.getSource().getSender();
+                for(String message : locale.help()) {
+                    sender.sendMessage(FormatUtil.format(message));
                 }
-            } else {
-                player.sendMessage(FormatUtil.format(locale.prefix() + locale.noPermission()));
+                
+                return 1;
+            })
+        );
+        
+        builder.then(Commands.literal("reload")
+            .requires(ctx -> ctx.getSender().hasPermission("skysellwands.commands.skysellwands.reload"))
+            .executes(ctx -> {
+                Locale locale = localeManager.getLocale();
+                CommandSender sender = ctx.getSource().getSender();
 
-                return false;
-            }
-        } else {
-            final ComponentLogger logger = skySellWands.getComponentLogger();
+                skySellWands.reload();
 
-            switch(args.length) {
-                case 1 -> {
-                    switch(args[0].toLowerCase()) {
-                        case "help" -> {
-                            for(String message : locale.help()) {
-                                logger.info(FormatUtil.format(message));
-                            }
+                sender.sendMessage(FormatUtil.format(locale.prefix() + locale.configReload()));
+                
+                return 1;
+            })
+        );
+        
+        builder.then(Commands.literal("give")
+            .requires(ctx -> ctx.getSender().hasPermission("skysellwands.commands.skysellwands.give"))
+            .then(Commands.argument("player_name", ArgumentTypes.player())
+                .then(Commands.argument("uses", IntegerArgumentType.integer())
+                    .suggests((commandContext, suggestionsBuilder) -> {
+                        Message message = MessageComponentSerializer.message().serialize(FormatUtil.format("<green>A value of -1 will set the sell wand to have infinite uses.</green>"));
+                        suggestionsBuilder.suggest(-1, message);
 
-                            return true;
-                        }
+                        return suggestionsBuilder.buildFuture();
+                    })
+                    .then(Commands.argument("amount", IntegerArgumentType.integer())
+                        .executes(ctx -> {
+                            Player player = ctx.getArgument("player_name", Player.class);
+                            int uses = ctx.getArgument("uses", int.class);
+                            int amount = ctx.getArgument("amount", int.class);
 
-                        case "reload" -> {
-                            skySellWands.reload();
-
-                            logger.info(FormatUtil.format(locale.configReload()));
-
-                            return true;
-                        }
-
-                        default -> {
-                            logger.info(FormatUtil.format(locale.unknownArgument()));
-
-                            return false;
-                        }
-                    }
-                }
-
-                case 4 -> {
-                    // 0 -> give
-                    // 1 -> player_name
-                    // 2 -> uses
-                    // 3 -> amount
-                    if(args[0].equalsIgnoreCase("give")) {
-                        Player target = skySellWands.getServer().getPlayer(args[1]);
-                        String arg3 = args[2].toLowerCase();
-                        int uses;
-                        int amount;
-
-                        if(arg3.equals("unlimited")
-                                || arg3.equals("infinite")
-                                || arg3.equals("inf")) {
-                            uses = -1;
-                        } else {
-                            try {
-                                uses = Integer.parseInt(args[2]);
-                            } catch (NumberFormatException ignored) {
-                                logger.info(FormatUtil.format(locale.invalidUses()));
-
-                                return false;
-                            }
-                        }
-
-                        try {
-                            amount = Integer.parseInt(args[3]);
-                        } catch (NumberFormatException ignored) {
-                            logger.info(FormatUtil.format(locale.invalidAmount()));
-
-                            return false;
-                        }
-
-                        if(target != null && target.isOnline() && target.isConnected()) {
                             if(uses == -1) {
-                                wandManager.giveUnlimitedWand(target, amount);
+                                wandManager.giveUnlimitedWand(player, amount);
                             } else {
-                                wandManager.giveWand(target, uses, amount);
+                                wandManager.giveWand(player, uses, amount);
                             }
 
-                            return true;
-                        } else {
-                            logger.info(FormatUtil.format(locale.invalidPlayer()));
-
-                            return false;
-                        }
-                    } else {
-                        logger.info(FormatUtil.format(locale.unknownArgument()));
-
-                        return false;
-                    }
-                }
-
-                default -> {
-                    logger.info(FormatUtil.format(locale.unknownArgument()));
-
-                    return false;
-                }
-            }
-        }
-    }
-
-    @Override
-    public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        List<String> subCmds = new ArrayList<>();
-
-        if(sender instanceof Player) {
-            switch (args.length) {
-                case 1 -> {
-                    if (sender.hasPermission("skysellwands.commands.skysellwands.give")) subCmds.add("give");
-                    if (sender.hasPermission("skysellwands.commands.skysellwands.help")) subCmds.add("help");
-                    if (sender.hasPermission("skysellwands.commands.skysellwands.reload")) subCmds.add("reload");
-                }
-
-                case 2 -> {
-                    if(args[0].equalsIgnoreCase("give")) {
-                        if (sender.hasPermission("skysellwands.commands.skysellwands.give")) {
-                            for (Player p : skySellWands.getServer().getOnlinePlayers()) {
-                                subCmds.add(p.getName());
-                            }
-                        }
-                    }
-                }
-            }
-        } else {
-            switch(args.length) {
-                case 1 -> {
-                    subCmds.add("give");
-                    subCmds.add("help");
-                    subCmds.add("reload");
-                }
-
-                case 2 -> {
-                    if(args[0].equalsIgnoreCase("give")) {
-                        for (Player p : skySellWands.getServer().getOnlinePlayers()) {
-                            subCmds.add(p.getName());
-                        }
-                    }
-                }
-            }
-        }
-
-        return subCmds;
+                            return 1;
+                        })
+                    )
+                )
+            )
+        );
+        
+        return builder.build();
     }
 }
