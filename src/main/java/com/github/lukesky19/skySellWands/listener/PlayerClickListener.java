@@ -41,6 +41,9 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.util.List;
 
 public class PlayerClickListener implements Listener {
@@ -87,7 +90,7 @@ public class PlayerClickListener implements Listener {
 
                         // Check if the player can access the container before selling
                         if(!hookManager.canPlayerOpen(player, block.getLocation())) {
-                            player.sendMessage(FormatUtil.format(locale.prefix() + locale.noAccess()));
+                            player.sendMessage(FormatUtil.format(player, locale.prefix() + locale.noAccess()));
                             return;
                         }
 
@@ -105,12 +108,17 @@ public class PlayerClickListener implements Listener {
                             // If at least one item was sold, send a success message
                             if (result) {
                                 // Get the player's balance
-                                double balance = skySellWands.getEconomy().getBalance(player);
+                                DecimalFormat df = new DecimalFormat("#.##");
+                                df.setRoundingMode(RoundingMode.CEILING);
+
+                                BigDecimal bigBalance = BigDecimal.valueOf(skySellWands.getEconomy().getBalance(player));
+                                String bal = df.format(bigBalance);
+
                                 // Create placeholders
-                                List<TagResolver.Single> placeholders = List.of(Placeholder.parsed("bal", String.valueOf(balance)));
+                                List<TagResolver.Single> placeholders = List.of(Placeholder.parsed("bal", bal));
 
                                 // Send player a success message
-                                player.sendMessage(FormatUtil.format(locale.prefix() + locale.sellSuccess(), placeholders));
+                                player.sendMessage(FormatUtil.format(player,locale.prefix() + locale.sellSuccess(), placeholders));
 
                                 // If the uses are not unlimited (-1), update the number of uses
                                 if(uses != -1) {
@@ -122,10 +130,10 @@ public class PlayerClickListener implements Listener {
                                     if (updatedUses == 0) {
                                         player.getInventory().remove(handItem);
 
-                                        player.sendMessage(FormatUtil.format(locale.prefix() + locale.wandUsedUp()));
+                                        player.sendMessage(FormatUtil.format(player, locale.prefix() + locale.wandUsedUp()));
                                     } else {
                                         List<TagResolver.Single> lorePlaceholders = List.of(Placeholder.parsed("uses", String.valueOf(updatedUses)));
-                                        List<Component> lore = settings.item().lore().stream().map(string -> FormatUtil.format(string, lorePlaceholders)).toList();
+                                        List<Component> lore = settings.item().lore().stream().map(string -> FormatUtil.format(player, string, lorePlaceholders)).toList();
 
                                         itemMeta.lore(lore);
 
@@ -138,11 +146,11 @@ public class PlayerClickListener implements Listener {
                                 }
                             } else {
                                 // Send a message if no items were sold
-                                player.sendMessage(FormatUtil.format(locale.prefix() + locale.noItemsSold()));
+                                player.sendMessage(FormatUtil.format(player, locale.prefix() + locale.noItemsSold()));
                             }
                         } else {
                             // Send a message if the inventory is empty
-                            player.sendMessage(FormatUtil.format(locale.prefix() + locale.containerInventoryEmpty()));
+                            player.sendMessage(FormatUtil.format(player, locale.prefix() + locale.containerInventoryEmpty()));
                         }
                     }
                 }
