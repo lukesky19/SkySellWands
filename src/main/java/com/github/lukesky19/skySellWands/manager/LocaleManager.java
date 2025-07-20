@@ -15,28 +15,33 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-package com.github.lukesky19.skySellWands.configuration.manager;
+package com.github.lukesky19.skySellWands.manager;
 
 import com.github.lukesky19.skySellWands.SkySellWands;
-import com.github.lukesky19.skySellWands.configuration.record.Locale;
-import com.github.lukesky19.skySellWands.configuration.record.Settings;
-import com.github.lukesky19.skylib.config.ConfigurationUtility;
-import com.github.lukesky19.skylib.format.FormatUtil;
+import com.github.lukesky19.skySellWands.configuration.Locale;
+import com.github.lukesky19.skySellWands.configuration.Settings;
+import com.github.lukesky19.skylib.api.adventure.AdventureUtil;
+import com.github.lukesky19.skylib.api.configurate.ConfigurationUtility;
 import com.github.lukesky19.skylib.libs.configurate.ConfigurateException;
 import com.github.lukesky19.skylib.libs.configurate.ConfigurationNode;
 import com.github.lukesky19.skylib.libs.configurate.yaml.YamlConfigurationLoader;
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.nio.file.Path;
 import java.util.List;
 
+/**
+ * This class manages the plugin's locale configuration.
+ */
 public class LocaleManager {
-    private final SkySellWands skySellWands;
-    private final SettingsManager settingsManager;
+    private final @NotNull SkySellWands skySellWands;
+    private final @NotNull SettingsManager settingsManager;
 
-    private Locale locale;
-    private final Locale DEFAULT_LOCALE = new Locale(
+    private @Nullable Locale locale;
+    private final @NotNull Locale DEFAULT_LOCALE = new Locale(
             "1.2.0",
             "<aqua><bold>SkySellWands</bold></aqua><gray> ▪ </gray>",
             List.of(
@@ -60,7 +65,9 @@ public class LocaleManager {
      * @param skySellWands The plugin's instance.
      * @param settingsManager A settings manager instance.
      */
-    public LocaleManager(SkySellWands skySellWands, SettingsManager settingsManager) {
+    public LocaleManager(
+            @NotNull SkySellWands skySellWands,
+            @NotNull SettingsManager settingsManager) {
         this.skySellWands = skySellWands;
         this.settingsManager = settingsManager;
     }
@@ -68,9 +75,9 @@ public class LocaleManager {
     /**
      * Gets the plugin's locale or default locale.
      * If the plugin's locale config failed to load, the default locale will be provided.
-     * @return A Locale object.
+     * @return The plugin's {@link Locale}.
      */
-    public Locale getLocale() {
+    public @NotNull Locale getLocale() {
         if(locale == null) return DEFAULT_LOCALE;
 
         return locale;
@@ -80,10 +87,9 @@ public class LocaleManager {
      * A method to reload the plugin's locale config.
      */
     public void reload() {
-        final Settings settings = settingsManager.getSettings();
-
         locale = null;
 
+        Settings settings = settingsManager.getSettings();
         if(settings == null) return;
 
         copyDefaultLocales();
@@ -135,10 +141,13 @@ public class LocaleManager {
                 || locale.noAccess() == null) {
             locale = null;
 
-            logger.warn(FormatUtil.format("<yellow>Your locale configuration is invalid. The plugin will use an internal locale instead."));
+            logger.warn(AdventureUtil.serialize("<yellow>Your locale configuration is invalid. The plugin will use an internal locale instead."));
         }
     }
 
+    /**
+     * Migrates the plugin's locale from any legacy versions.
+     */
     private void migrateLocale() {
         if(locale == null) return;
 
@@ -212,7 +221,11 @@ public class LocaleManager {
         }
     }
 
-    private void saveLocale(Locale locale) {
+    /**
+     * Saves the provided {@link Locale} to the disk.
+     * @param locale The {@link Locale} to save.
+     */
+    private void saveLocale(@NotNull Locale locale) {
         Settings settings = settingsManager.getSettings();
         if(settings == null) return;
 

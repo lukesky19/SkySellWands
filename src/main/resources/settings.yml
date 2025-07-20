@@ -1,8 +1,9 @@
-config-version: 1.0.0
+config-version: 1.1.0.0
 locale: en_US
 item:
-    material: BREEZE_ROD
+    item-type: BREEZE_ROD
     name: "<green><bold>SellWand</bold></green>"
     lore:
         - "<aqua><bold>Uses Left</bold></aqua> <white>: <uses></white>"
-    enchanted: true
+    options:
+        enchantment-glint: true

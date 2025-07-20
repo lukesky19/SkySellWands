@@ -1,5 +1,5 @@
 /*
-    SkyHoppers adds upgradable hoppers that can suction items, transfer items wirelessly to linked containers.
+    SkySellWands adds sell wands that uses SkyShop's API selling.
     Copyright (C) 2024  lukeskywlker19
 
     This program is free software: you can redistribute it and/or modify
@@ -19,6 +19,7 @@ package com.github.lukesky19.skySellWands.hooks;
 
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 import world.bentobox.bentobox.BentoBox;
 import world.bentobox.bentobox.api.user.User;
 import world.bentobox.bentobox.database.objects.Island;
@@ -26,11 +27,19 @@ import world.bentobox.bentobox.lists.Flags;
 
 import java.util.Optional;
 
+/**
+ * This class hooks into BentoBox to check if a player can open containers at a particular location.
+ */
 public class BentoBoxHook implements ProtectionHook {
+    /**
+     * Default Constructor.
+     */
+    public BentoBoxHook() {}
+
     @Override
-    public boolean canPlayerOpen(Player player, Location location) {
+    public boolean canPlayerOpen(@NotNull Player player, @NotNull Location location) {
         Optional<Island> optionalIsland = BentoBox.getInstance().getIslands().getIslandAt(location);
-        if (optionalIsland.isEmpty()) return true;
+        if(optionalIsland.isEmpty()) return true;
 
         Island island = optionalIsland.orElseThrow();
         User user = BentoBox.getInstance().getPlayers().getUser(player.getUniqueId());

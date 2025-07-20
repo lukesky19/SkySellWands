@@ -18,10 +18,10 @@
 package com.github.lukesky19.skySellWands.command;
 
 import com.github.lukesky19.skySellWands.SkySellWands;
-import com.github.lukesky19.skySellWands.configuration.manager.LocaleManager;
-import com.github.lukesky19.skySellWands.configuration.record.Locale;
+import com.github.lukesky19.skySellWands.configuration.Locale;
+import com.github.lukesky19.skySellWands.manager.LocaleManager;
 import com.github.lukesky19.skySellWands.manager.WandManager;
-import com.github.lukesky19.skylib.format.FormatUtil;
+import com.github.lukesky19.skylib.api.adventure.AdventureUtil;
 import com.mojang.brigadier.Message;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -33,19 +33,36 @@ import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import io.papermc.paper.command.brigadier.argument.resolvers.selector.PlayerSelectorArgumentResolver;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
+/**
+ * This class is used to create the skysellwand command.
+ */
 public class SellWandCommand {
-    private final SkySellWands skySellWands;
-    private final LocaleManager localeManager;
-    private final WandManager wandManager;
+    private final @NotNull SkySellWands skySellWands;
+    private final @NotNull LocaleManager localeManager;
+    private final @NotNull WandManager wandManager;
 
-    public SellWandCommand(SkySellWands skySellWands, LocaleManager localeManager, WandManager wandManager) {
+    /**
+     * Constructor
+     * @param skySellWands A {@link SkySellWands} instance.
+     * @param localeManager A {@link LocaleManager} instance.
+     * @param wandManager A {@link WandManager} instance.
+     */
+    public SellWandCommand(
+            @NotNull SkySellWands skySellWands,
+            @NotNull LocaleManager localeManager,
+            @NotNull WandManager wandManager) {
         this.skySellWands = skySellWands;
         this.localeManager = localeManager;
         this.wandManager = wandManager;
     }
 
-    public LiteralCommandNode<CommandSourceStack> createCommand() {
+    /**
+     * This method creates the skysellwand command.
+     * @return The {@link LiteralCommandNode} of type {@link CommandSourceStack} for the skysellwand command.
+     */
+    public @NotNull LiteralCommandNode<CommandSourceStack> createCommand() {
         LiteralArgumentBuilder<CommandSourceStack> builder = Commands.literal("skysellwand")
                 .requires(ctx -> ctx.getSender().hasPermission("skysellwands.commands.skysellwands"));
 
@@ -56,7 +73,7 @@ public class SellWandCommand {
                 
                 CommandSender sender = ctx.getSource().getSender();
                 for(String message : locale.help()) {
-                    sender.sendMessage(FormatUtil.format(message));
+                    sender.sendMessage(AdventureUtil.serialize(message));
                 }
                 
                 return 1;
@@ -71,7 +88,7 @@ public class SellWandCommand {
 
                 skySellWands.reload();
 
-                sender.sendMessage(FormatUtil.format(locale.prefix() + locale.configReload()));
+                sender.sendMessage(AdventureUtil.serialize(locale.prefix() + locale.configReload()));
                 
                 return 1;
             })
@@ -82,7 +99,7 @@ public class SellWandCommand {
             .then(Commands.argument("player name", ArgumentTypes.player())
                 .then(Commands.argument("uses", IntegerArgumentType.integer())
                     .suggests((commandContext, suggestionsBuilder) -> {
-                        Message message = MessageComponentSerializer.message().serialize(FormatUtil.format("<green>A value of -1 will set the sell wand to have infinite uses.</green>"));
+                        Message message = MessageComponentSerializer.message().serialize(AdventureUtil.serialize("<green>A value of -1 will set the sell wand to have infinite uses.</green>"));
                         suggestionsBuilder.suggest(-1, message);
 
                         return suggestionsBuilder.buildFuture();

@@ -15,21 +15,37 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-package com.github.lukesky19.skySellWands.hooks;
+package com.github.lukesky19.skySellWands.util;
 
-import org.bukkit.Location;
-import org.bukkit.entity.Player;
+import org.bukkit.NamespacedKey;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * This interface is used to create hooks for specific plugins.
+ * This enum contains the {@link NamespacedKey} names for the plugin.
  */
-public interface ProtectionHook {
+public enum WandKeys {
     /**
-     * Can the Player open containers at the given Location?
-     * @param player   The Player who is attempting to access the container.
-     * @param location The Location of the container that is being accessed.
-     * @return true If the Player can open the container.
+     * The name for the key that stores the number of uses for the sell wand.
      */
-    boolean canPlayerOpen(@NotNull Player player, @NotNull Location location);
+    USES;
+
+    /**
+     * The {@link NamespacedKey}.
+     */
+    private final @NotNull NamespacedKey key;
+
+    /**
+     * Constructor that creates the {@link NamespacedKey}.
+     */
+    WandKeys() {
+        this.key = new NamespacedKey("skysellwands", this.name().toLowerCase());
+    }
+
+    /**
+     * Get the {@link NamespacedKey}.
+     * @return The {@link NamespacedKey} that stores the amount of uses on a sell wand.
+     */
+    public @NotNull NamespacedKey getKey() {
+        return key;
+    }
 }

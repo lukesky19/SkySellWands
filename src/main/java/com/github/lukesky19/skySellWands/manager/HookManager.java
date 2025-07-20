@@ -1,5 +1,5 @@
 /*
-    SkyHoppers adds upgradable hoppers that can suction items, transfer items wirelessly to linked containers.
+    SkySellWands adds sell wands that uses SkyShop's API selling.
     Copyright (C) 2024  lukeskywlker19
 
     This program is free software: you can redistribute it and/or modify
@@ -25,22 +25,33 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This class manages hooks into different plugins.
+ */
 public class HookManager {
-    private final SkySellWands skySellWands;
-    private final List<ProtectionHook> protectionHooks = new ArrayList<>();
+    private final @NotNull SkySellWands skySellWands;
+    private final @NotNull List<ProtectionHook> protectionHooks = new ArrayList<>();
 
-    public HookManager(SkySellWands skySellWands) {
+    /**
+     * Constructor
+     * @param skySellWands A {@link SkySellWands} instance.
+     */
+    public HookManager(@NotNull SkySellWands skySellWands) {
         this.skySellWands = skySellWands;
     }
 
+    /**
+     * Reload plugin hooks.
+     */
     public void reload() {
         protectionHooks.clear();
 
-        final PluginManager pluginManager = skySellWands.getServer().getPluginManager();
+        PluginManager pluginManager = skySellWands.getServer().getPluginManager();
 
         Plugin bentoBox = pluginManager.getPlugin("BentoBox");
         if(bentoBox != null && bentoBox.isEnabled()) {
@@ -60,16 +71,14 @@ public class HookManager {
      * @return true If the Player can open the container.
      */
     public boolean canPlayerOpen(Player player, Location location) {
-        for (ProtectionHook hook : this.protectionHooks) {
+        for(ProtectionHook hook : this.protectionHooks) {
             if(hook instanceof BentoBoxHook) {
-                if (hook.canPlayerOpen(player, location))
-                    return true;
+                if(hook.canPlayerOpen(player, location)) return true;
             } else {
-                if (!hook.canPlayerOpen(player, location))
-                    return false;
+                if(!hook.canPlayerOpen(player, location)) return false;
             }
         }
 
-        return false;
+        return true;
     }
 }
