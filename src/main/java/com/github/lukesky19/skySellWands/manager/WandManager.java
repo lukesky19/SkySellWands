@@ -17,16 +17,16 @@
 */
 package com.github.lukesky19.skySellWands.manager;
 
-import com.github.lukesky19.skySellWands.configuration.manager.LocaleManager;
-import com.github.lukesky19.skySellWands.configuration.manager.SettingsManager;
-import com.github.lukesky19.skySellWands.configuration.record.Locale;
-import com.github.lukesky19.skySellWands.configuration.record.Settings;
-import com.github.lukesky19.skylib.format.FormatUtil;
-import com.github.lukesky19.skylib.player.PlayerUtil;
-import net.kyori.adventure.text.Component;
+import com.github.lukesky19.skySellWands.SkySellWands;
+import com.github.lukesky19.skySellWands.configuration.Locale;
+import com.github.lukesky19.skySellWands.configuration.Settings;
+import com.github.lukesky19.skySellWands.util.WandKeys;
+import com.github.lukesky19.skylib.api.adventure.AdventureUtil;
+import com.github.lukesky19.skylib.api.itemstack.ItemStackBuilder;
+import com.github.lukesky19.skylib.api.player.PlayerUtil;
+import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -35,12 +35,27 @@ import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.Optional;
 
+/**
+ * This class manages the creation of sell wands.
+ */
 public class WandManager {
-    private final SettingsManager settingsManager;
-    private final LocaleManager localeManager;
+    private final @NotNull ComponentLogger logger;
+    private final @NotNull SettingsManager settingsManager;
+    private final @NotNull LocaleManager localeManager;
 
-    public WandManager(SettingsManager settingsManager, LocaleManager localeManager) {
+    /**
+     * Constructor
+     * @param skySellWands A {@link SkySellWands} instance.
+     * @param settingsManager A {@link SettingsManager} instance.
+     * @param localeManager A {@link LocaleManager} instance.
+     */
+    public WandManager(
+            @NotNull SkySellWands skySellWands,
+            @NotNull SettingsManager settingsManager,
+            @NotNull LocaleManager localeManager) {
+        this.logger = skySellWands.getComponentLogger();
         this.settingsManager = settingsManager;
         this.localeManager = localeManager;
     }
@@ -57,45 +72,37 @@ public class WandManager {
         Settings settings = settingsManager.getSettings();
         if(settings == null) return;
 
-        // Get the configured material
-        Material material = Material.getMaterial(settings.item().material());
-        if(material == null) return;
+        // Create the placeholders list
+        List<TagResolver.Single> placeholders = List.of(Placeholder.parsed("uses", String.valueOf(uses)));
 
         // Create the ItemStack
-        ItemStack itemStack = new ItemStack(material);
-        // Get the ItemMeta
-        ItemMeta itemMeta = itemStack.getItemMeta();
-
-        // Set the item name
-        if(settings.item().name() != null) {
-            itemMeta.displayName(FormatUtil.format(settings.item().name()));
+        Optional<ItemStack> optionalItemStack = new ItemStackBuilder(logger).fromItemStackConfig(settings.item(), null, null, placeholders).setMaxStackSize(1).buildItemStack();
+        if(optionalItemStack.isEmpty()) {
+            logger.error(AdventureUtil.serialize("Failed to create the ItemStack for the sell wand. Double-check your configuration."));
+            player.sendMessage(AdventureUtil.serialize(locale.prefix() + "<red>Failed to create the ItemStack for the sell wand. Double-check your configuration.</red>"));
+            return;
         }
 
-        // Set the lore
-        List<TagResolver.Single> placeholders = List.of(Placeholder.parsed("uses", String.valueOf(uses)));
-        List<Component> lore = settings.item().lore().stream().map(string -> FormatUtil.format(string, placeholders)).toList();
-        itemMeta.lore(lore);
+        ItemStack itemStack = optionalItemStack.get();
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        if(itemMeta == null) {
+            logger.error(AdventureUtil.serialize("Failed to get the ItemStack's ItemMeta for the sell wand. Double-check your configuration."));
+            player.sendMessage(AdventureUtil.serialize(locale.prefix() + "<red>Failed to get the ItemStack's ItemMeta for the sell wand. Double-check your configuration.</red>"));
+            return;
+        }
 
         // Save the number of uses to the PDC
         @NotNull PersistentDataContainer pdc = itemMeta.getPersistentDataContainer();
         pdc.set(WandKeys.USES.getKey(), PersistentDataType.INTEGER, uses);
 
-        // Set if the item is enchanted or not
-        itemMeta.setEnchantmentGlintOverride(settings.item().enchanted());
-
-        itemMeta.setMaxStackSize(1);
-
-        // Set the item's ItemMeta
+        // Set the ItemStack's ItemMeta
         itemStack.setItemMeta(itemMeta);
-
-        // Set the number of sellwands to give.
-        itemStack.setAmount(amount);
 
         // Give the Player the item.
         PlayerUtil.giveItem(player.getInventory(), itemStack, amount, player.getLocation());
 
         // Send the player a message that a sellwand was given
-        player.sendMessage(FormatUtil.format(locale.prefix() + locale.givenWand(), placeholders));
+        player.sendMessage(AdventureUtil.serialize(locale.prefix() + locale.givenWand(), placeholders));
     }
 
     /**
@@ -109,44 +116,36 @@ public class WandManager {
         Settings settings = settingsManager.getSettings();
         if(settings == null) return;
 
-        // Get the configured material
-        Material material = Material.getMaterial(settings.item().material());
-        if(material == null) return;
+        // Create the placeholders list
+        List<TagResolver.Single> placeholders = List.of(Placeholder.parsed("uses", "unlimited"));
 
         // Create the ItemStack
-        ItemStack itemStack = new ItemStack(material);
-        // Get the ItemMeta
-        ItemMeta itemMeta = itemStack.getItemMeta();
-
-        // Set the item name
-        if(settings.item().name() != null) {
-            itemMeta.displayName(FormatUtil.format(settings.item().name()));
+        Optional<ItemStack> optionalItemStack = new ItemStackBuilder(logger).fromItemStackConfig(settings.item(), null, null, placeholders).setMaxStackSize(1).buildItemStack();
+        if(optionalItemStack.isEmpty()) {
+            logger.error(AdventureUtil.serialize("Failed to create the ItemStack for the sell wand. Double-check your configuration."));
+            player.sendMessage(AdventureUtil.serialize(locale.prefix() + "<red>Failed to create the ItemStack for the sell wand. Double-check your configuration.</red>"));
+            return;
         }
 
-        // Set the lore
-        List<TagResolver.Single> placeholders = List.of(Placeholder.parsed("uses", "unlimited"));
-        List<Component> lore = settings.item().lore().stream().map(string -> FormatUtil.format(string, placeholders)).toList();
-        itemMeta.lore(lore);
+        ItemStack itemStack = optionalItemStack.get();
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        if(itemMeta == null) {
+            logger.error(AdventureUtil.serialize("Failed to get the ItemStack's ItemMeta for the sell wand. Double-check your configuration."));
+            player.sendMessage(AdventureUtil.serialize(locale.prefix() + "<red>Failed to get the ItemStack's ItemMeta for the sell wand. Double-check your configuration.</red>"));
+            return;
+        }
 
         // Save the number of uses to the PDC
         @NotNull PersistentDataContainer pdc = itemMeta.getPersistentDataContainer();
         pdc.set(WandKeys.USES.getKey(), PersistentDataType.INTEGER, -1);
 
-        // Set if the item is enchanted or not
-        itemMeta.setEnchantmentGlintOverride(settings.item().enchanted());
-
-        itemMeta.setMaxStackSize(1);
-
-        // Set the item's ItemMeta
+        // Set the ItemStack's ItemMeta
         itemStack.setItemMeta(itemMeta);
-
-        // Set the number of sellwands to give.
-        itemStack.setAmount(amount);
 
         // Give the Player the item.
         PlayerUtil.giveItem(player.getInventory(), itemStack, amount, player.getLocation());
 
         // Send the player a message that a sellwand was given
-        player.sendMessage(FormatUtil.format(locale.prefix() + locale.givenWand(), placeholders));
+        player.sendMessage(AdventureUtil.serialize(locale.prefix() + locale.givenWand(), placeholders));
     }
 }

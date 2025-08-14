@@ -15,14 +15,21 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-package com.github.lukesky19.skySellWands.configuration.record;
+package com.github.lukesky19.skySellWands.configuration;
 
+import com.github.lukesky19.skylib.api.itemstack.ItemStackConfig;
 import com.github.lukesky19.skylib.libs.configurate.objectmapping.ConfigSerializable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
-
+/**
+ * This record contains the plugin's configuration.
+ * @param configVersion The config version.
+ * @param locale The plugin's locale.
+ * @param item The {@link ItemStackConfig} for the sell wand.
+ */
 @ConfigSerializable
-public record Settings(String configVersion, String locale, Item item) {
-    @ConfigSerializable
-    public record Item(String material, String name, List<String> lore, boolean enchanted) {}
-}
+public record Settings(
+        @Nullable String configVersion,
+        @Nullable String locale,
+        @NotNull ItemStackConfig item) {}

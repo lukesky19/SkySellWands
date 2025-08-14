@@ -15,20 +15,29 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-package com.github.lukesky19.skySellWands.manager;
+package com.github.lukesky19.skySellWands;
 
-import org.bukkit.NamespacedKey;
+import com.github.lukesky19.skySellWands.util.WandKeys;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.jetbrains.annotations.NotNull;
 
-public enum WandKeys {
-    USES;
+/**
+ * This class provides the SkySellWands API.
+ */
+public class SkySellWandsAPI {
+    /**
+     * Default Constructor.
+     */
+    public SkySellWandsAPI() {}
 
-    private final NamespacedKey key;
-
-    WandKeys() {
-        this.key = new NamespacedKey("skysellwands", this.name().toLowerCase());
-    }
-
-    public NamespacedKey getKey() {
-        return key;
+    /**
+     * Is the provided {@link ItemStack} a sell wand?
+     * @param itemStack The {@link ItemStack} to check.
+     * @return true if a sell wand, otherwise false.
+     */
+    public boolean isItemStackSellWand(@NotNull ItemStack itemStack) {
+        PersistentDataContainer pdc = itemStack.getItemMeta().getPersistentDataContainer();
+        return pdc.has(WandKeys.USES.getKey());
     }
 }

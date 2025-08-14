@@ -1,4 +1,4 @@
-config-version: 1.2.0
+config-version: 1.3.0
 prefix: "<aqua><bold>SkySellWands</bold></aqua><gray> ▪ </gray>"
 help:
     - "<aqua>SkySellWands is developed by <white><bold>lukeskywlker19</bold></white>.</aqua>"
@@ -7,13 +7,8 @@ help:
     - "<aqua><bold>List of Commands:</bold></aqua>"
     - "<white>/<aqua>sellwand</aqua> <yellow>help</yellow></white>"
     - "<white>/<aqua>sellwand</aqua> <yellow>reload</yellow></white>"
-    - "<white>/<aqua>sellwand</aqua> <yellow>give</yellow> <yellow><player_name></yellow> <yellow><# of uses | unlimited | infinite | inf></yellow> <yellow><amount></yellow></white>"
-no-permission: "<red>You do not have permission for this command.</red>"
-unknown-argument: "<red>Unknown argument.</red>"
+    - "<white>/<aqua>sellwand</aqua> <yellow>give</yellow> <yellow><player_name></yellow> <yellow><# of uses></yellow> <yellow><amount></yellow></white>"
 config-reload: "<aqua>Configuration files have been reloaded.</aqua>"
-invalid-player: "<red>The player is invalid. Are they online?</red>"
-invalid-uses: "<red>The number of uses provided is not a valid integer.</red>"
-invalid-amount: "<red>The amount of sellwands to give is not a valid integer.</red>"
 # Placeholders: <uses>
 given-wand: "<aqua>You have been given a sellwand with <yellow><uses></yellow> uses.</aqua>"
 # Placeholders: <bal>
