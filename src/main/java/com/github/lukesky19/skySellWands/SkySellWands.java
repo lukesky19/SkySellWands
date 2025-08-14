@@ -20,7 +20,6 @@ package com.github.lukesky19.skySellWands;
 import com.github.lukesky19.skySellWands.command.SellWandCommand;
 import com.github.lukesky19.skySellWands.listener.ItemSoldListener;
 import com.github.lukesky19.skySellWands.listener.PlayerClickListener;
-import com.github.lukesky19.skySellWands.listener.ShopCreationListener;
 import com.github.lukesky19.skySellWands.manager.HookManager;
 import com.github.lukesky19.skySellWands.manager.LocaleManager;
 import com.github.lukesky19.skySellWands.manager.SettingsManager;
@@ -92,11 +91,6 @@ public final class SkySellWands extends JavaPlugin {
 
         // Register Listener
         this.getServer().getPluginManager().registerEvents(playerClickListener, this);
-
-        Plugin quickShop = this.getServer().getPluginManager().getPlugin("QuicKShop-Hikari");
-        if(quickShop != null && quickShop.isEnabled()) {
-            this.getServer().getPluginManager().registerEvents(new ShopCreationListener(), this);
-        }
 
         this.getServer().getPluginManager().registerEvents(new ItemSoldListener(), this);
 

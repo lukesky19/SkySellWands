@@ -10,7 +10,6 @@
 ## Soft Dependencies
 * BentoBox
 * WorldGuard
-* QuickShop-Hikari
 
 ## Commands
 - /skysellwand - Command to open the shop.

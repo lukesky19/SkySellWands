@@ -24,7 +24,6 @@ dependencies {
     // Hooks
     compileOnly("world.bentobox:bentobox:2.7.0-SNAPSHOT")
     compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.14-SNAPSHOT")
-    compileOnly("com.ghostchu:quickshop-api:6.2.0.8")
 }
 
 java {
