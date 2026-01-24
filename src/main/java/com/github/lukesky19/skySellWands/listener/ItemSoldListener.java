@@ -18,7 +18,7 @@
 package com.github.lukesky19.skySellWands.listener;
 
 import com.github.lukesky19.skySellWands.util.WandKeys;
-import com.github.lukesky19.skyshop.event.ItemSoldEvent;
+import com.github.lukesky19.skyshop.api.event.ItemPreSellEvent;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -34,11 +34,11 @@ public class ItemSoldListener implements Listener {
     public ItemSoldListener() {}
 
     /**
-     * Listens for an {@link ItemSoldEvent} and cancels it if the item is a sell wand.
-     * @param itemSoldEvent An {@link ItemSoldEvent}.
+     * Listens for an {@link ItemPreSellEvent} and cancels it if the item is a sell wand.
+     * @param itemSoldEvent An {@link ItemPreSellEvent}.
      */
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
-    public void onItemSold(ItemSoldEvent itemSoldEvent) {
+    public void onItemSold(ItemPreSellEvent itemSoldEvent) {
         PersistentDataContainer pdc = itemSoldEvent.getItemStack().getItemMeta().getPersistentDataContainer();
         // Check if it is a sellwand
         if (pdc.has(WandKeys.USES.getKey())) {

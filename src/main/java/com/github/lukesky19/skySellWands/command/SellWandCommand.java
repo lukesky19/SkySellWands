@@ -73,7 +73,7 @@ public class SellWandCommand {
                 
                 CommandSender sender = ctx.getSource().getSender();
                 for(String message : locale.help()) {
-                    sender.sendMessage(AdventureUtil.serialize(message));
+                    sender.sendMessage(AdventureUtil.deserialize(message));
                 }
                 
                 return 1;
@@ -88,7 +88,7 @@ public class SellWandCommand {
 
                 skySellWands.reload();
 
-                sender.sendMessage(AdventureUtil.serialize(locale.prefix() + locale.configReload()));
+                sender.sendMessage(AdventureUtil.deserialize(locale.prefix() + locale.configReload()));
                 
                 return 1;
             })
@@ -99,7 +99,7 @@ public class SellWandCommand {
             .then(Commands.argument("player name", ArgumentTypes.player())
                 .then(Commands.argument("uses", IntegerArgumentType.integer())
                     .suggests((commandContext, suggestionsBuilder) -> {
-                        Message message = MessageComponentSerializer.message().serialize(AdventureUtil.serialize("<green>A value of -1 will set the sell wand to have infinite uses.</green>"));
+                        Message message = MessageComponentSerializer.message().serialize(AdventureUtil.deserialize("<green>A value of -1 will set the sell wand to have infinite uses.</green>"));
                         suggestionsBuilder.suggest(-1, message);
 
                         return suggestionsBuilder.buildFuture();

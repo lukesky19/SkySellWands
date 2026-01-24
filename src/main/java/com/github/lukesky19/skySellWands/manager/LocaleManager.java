@@ -141,7 +141,7 @@ public class LocaleManager {
                 || locale.noAccess() == null) {
             locale = null;
 
-            logger.warn(AdventureUtil.serialize("<yellow>Your locale configuration is invalid. The plugin will use an internal locale instead."));
+            logger.warn(AdventureUtil.deserialize("<yellow>Your locale configuration is invalid. The plugin will use an internal locale instead."));
         }
     }
 

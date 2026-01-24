@@ -78,16 +78,16 @@ public class WandManager {
         // Create the ItemStack
         Optional<ItemStack> optionalItemStack = new ItemStackBuilder(logger).fromItemStackConfig(settings.item(), null, null, placeholders).setMaxStackSize(1).buildItemStack();
         if(optionalItemStack.isEmpty()) {
-            logger.error(AdventureUtil.serialize("Failed to create the ItemStack for the sell wand. Double-check your configuration."));
-            player.sendMessage(AdventureUtil.serialize(locale.prefix() + "<red>Failed to create the ItemStack for the sell wand. Double-check your configuration.</red>"));
+            logger.error(AdventureUtil.deserialize("Failed to create the ItemStack for the sell wand. Double-check your configuration."));
+            player.sendMessage(AdventureUtil.deserialize(locale.prefix() + "<red>Failed to create the ItemStack for the sell wand. Double-check your configuration.</red>"));
             return;
         }
 
         ItemStack itemStack = optionalItemStack.get();
         ItemMeta itemMeta = itemStack.getItemMeta();
         if(itemMeta == null) {
-            logger.error(AdventureUtil.serialize("Failed to get the ItemStack's ItemMeta for the sell wand. Double-check your configuration."));
-            player.sendMessage(AdventureUtil.serialize(locale.prefix() + "<red>Failed to get the ItemStack's ItemMeta for the sell wand. Double-check your configuration.</red>"));
+            logger.error(AdventureUtil.deserialize("Failed to get the ItemStack's ItemMeta for the sell wand. Double-check your configuration."));
+            player.sendMessage(AdventureUtil.deserialize(locale.prefix() + "<red>Failed to get the ItemStack's ItemMeta for the sell wand. Double-check your configuration.</red>"));
             return;
         }
 
@@ -102,7 +102,7 @@ public class WandManager {
         PlayerUtil.giveItem(player.getInventory(), itemStack, amount, player.getLocation());
 
         // Send the player a message that a sellwand was given
-        player.sendMessage(AdventureUtil.serialize(locale.prefix() + locale.givenWand(), placeholders));
+        player.sendMessage(AdventureUtil.deserialize(locale.prefix() + locale.givenWand(), placeholders));
     }
 
     /**
@@ -122,16 +122,16 @@ public class WandManager {
         // Create the ItemStack
         Optional<ItemStack> optionalItemStack = new ItemStackBuilder(logger).fromItemStackConfig(settings.item(), null, null, placeholders).setMaxStackSize(1).buildItemStack();
         if(optionalItemStack.isEmpty()) {
-            logger.error(AdventureUtil.serialize("Failed to create the ItemStack for the sell wand. Double-check your configuration."));
-            player.sendMessage(AdventureUtil.serialize(locale.prefix() + "<red>Failed to create the ItemStack for the sell wand. Double-check your configuration.</red>"));
+            logger.error(AdventureUtil.deserialize("Failed to create the ItemStack for the sell wand. Double-check your configuration."));
+            player.sendMessage(AdventureUtil.deserialize(locale.prefix() + "<red>Failed to create the ItemStack for the sell wand. Double-check your configuration.</red>"));
             return;
         }
 
         ItemStack itemStack = optionalItemStack.get();
         ItemMeta itemMeta = itemStack.getItemMeta();
         if(itemMeta == null) {
-            logger.error(AdventureUtil.serialize("Failed to get the ItemStack's ItemMeta for the sell wand. Double-check your configuration."));
-            player.sendMessage(AdventureUtil.serialize(locale.prefix() + "<red>Failed to get the ItemStack's ItemMeta for the sell wand. Double-check your configuration.</red>"));
+            logger.error(AdventureUtil.deserialize("Failed to get the ItemStack's ItemMeta for the sell wand. Double-check your configuration."));
+            player.sendMessage(AdventureUtil.deserialize(locale.prefix() + "<red>Failed to get the ItemStack's ItemMeta for the sell wand. Double-check your configuration.</red>"));
             return;
         }
 
@@ -146,6 +146,6 @@ public class WandManager {
         PlayerUtil.giveItem(player.getInventory(), itemStack, amount, player.getLocation());
 
         // Send the player a message that a sellwand was given
-        player.sendMessage(AdventureUtil.serialize(locale.prefix() + locale.givenWand(), placeholders));
+        player.sendMessage(AdventureUtil.deserialize(locale.prefix() + locale.givenWand(), placeholders));
     }
 }

@@ -25,7 +25,7 @@ import com.github.lukesky19.skySellWands.manager.LocaleManager;
 import com.github.lukesky19.skySellWands.manager.SettingsManager;
 import com.github.lukesky19.skySellWands.manager.WandManager;
 import com.github.lukesky19.skylib.api.adventure.AdventureUtil;
-import com.github.lukesky19.skyshop.SkyShopAPI;
+import com.github.lukesky19.skyshop.api.SkyShopAPI;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.plugin.Plugin;
@@ -130,7 +130,7 @@ public final class SkySellWands extends JavaPlugin {
             }
         }
 
-        this.getComponentLogger().error(AdventureUtil.serialize("Failed to retrieve economy, disabling plugin."));
+        this.getComponentLogger().error(AdventureUtil.deserialize("Failed to retrieve economy, disabling plugin."));
         this.getServer().getPluginManager().disablePlugin(this);
         return false;
     }
@@ -148,7 +148,7 @@ public final class SkySellWands extends JavaPlugin {
             }
         }
 
-        this.getComponentLogger().error(AdventureUtil.serialize("Failed to retrieve SkyShop's API, disabling plugin."));
+        this.getComponentLogger().error(AdventureUtil.deserialize("Failed to retrieve SkyShop's API, disabling plugin."));
         this.getServer().getPluginManager().disablePlugin(this);
         return false;
     }
@@ -170,7 +170,7 @@ public final class SkySellWands extends JavaPlugin {
             }
         }
 
-        this.getComponentLogger().error(AdventureUtil.serialize("SkyLib Version 1.3.0.0 or newer is required to run this plugin."));
+        this.getComponentLogger().error(AdventureUtil.deserialize("SkyLib Version 1.3.0.0 or newer is required to run this plugin."));
         this.getServer().getPluginManager().disablePlugin(this);
         return false;
     }
