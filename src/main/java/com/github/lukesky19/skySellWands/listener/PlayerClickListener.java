@@ -114,7 +114,7 @@ public class PlayerClickListener implements Listener {
 
         // Check if the player can access the container before selling
         if(!hookManager.canPlayerOpen(player, block.getLocation())) {
-            player.sendMessage(AdventureUtil.serialize(player, locale.prefix() + locale.noAccess()));
+            player.sendMessage(AdventureUtil.deserialize(player, locale.prefix() + locale.noAccess()));
             return;
         }
 
@@ -126,15 +126,15 @@ public class PlayerClickListener implements Listener {
         Inventory inventory = container.getInventory();
         // If the container's inventory is empty, send a message and return.
         if(container.getInventory().isEmpty()) {
-            player.sendMessage(AdventureUtil.serialize(player, locale.prefix() + locale.containerInventoryEmpty()));
+            player.sendMessage(AdventureUtil.deserialize(player, locale.prefix() + locale.containerInventoryEmpty()));
             return;
         }
 
         // Sell the container's inventory of items
-        boolean result = skySellWands.getSkyShopAPI().sellInventory(player, inventory, false);
+        boolean result = skySellWands.getSkyShopAPI().sellInventory(player, inventory, false, false, false);
         // Send a message if no items were sold and return.
         if(!result) {
-            player.sendMessage(AdventureUtil.serialize(player, locale.prefix() + locale.noItemsSold()));
+            player.sendMessage(AdventureUtil.deserialize(player, locale.prefix() + locale.noItemsSold()));
             return;
         }
 
@@ -149,7 +149,7 @@ public class PlayerClickListener implements Listener {
         List<TagResolver.Single> placeholders = List.of(Placeholder.parsed("bal", bal));
 
         // Send player a success message
-        player.sendMessage(AdventureUtil.serialize(player,locale.prefix() + locale.sellSuccess(), placeholders));
+        player.sendMessage(AdventureUtil.deserialize(player,locale.prefix() + locale.sellSuccess(), placeholders));
 
         // If the uses are not unlimited (-1), update the number of uses
         if(uses != -1) {
@@ -161,10 +161,10 @@ public class PlayerClickListener implements Listener {
             if(updatedUses == 0) {
                 player.getInventory().remove(handItem);
 
-                player.sendMessage(AdventureUtil.serialize(player, locale.prefix() + locale.wandUsedUp()));
+                player.sendMessage(AdventureUtil.deserialize(player, locale.prefix() + locale.wandUsedUp()));
             } else {
                 List<TagResolver.Single> lorePlaceholders = List.of(Placeholder.parsed("uses", String.valueOf(updatedUses)));
-                List<Component> lore = settings.item().lore().stream().map(string -> AdventureUtil.serialize(player, string, lorePlaceholders)).toList();
+                List<Component> lore = settings.item().lore().stream().map(string -> AdventureUtil.deserialize(player, string, lorePlaceholders)).toList();
 
                 itemMeta.lore(lore);
 

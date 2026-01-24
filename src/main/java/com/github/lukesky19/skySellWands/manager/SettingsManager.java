@@ -75,7 +75,7 @@ public class SettingsManager {
         try {
             settings = loader.load().get(Settings.class);
         } catch (ConfigurateException e) {
-            logger.error(AdventureUtil.serialize("Failed to load plugin settings: " + e.getMessage()));
+            logger.error(AdventureUtil.deserialize("Failed to load plugin settings: " + e.getMessage()));
             return;
         }
 
@@ -99,21 +99,21 @@ public class SettingsManager {
                 if(legacySettings == null) return;
 
                 if(legacySettings.item().material() == null) {
-                    logger.error(AdventureUtil.serialize("Unable to migrate legacy settings due to an invalid material."));
+                    logger.error(AdventureUtil.deserialize("Unable to migrate legacy settings due to an invalid material."));
                     settings = null;
                     return;
                 }
 
                 Material material = Material.getMaterial(legacySettings.item().material());
                 if(material == null) {
-                    logger.error(AdventureUtil.serialize("Unable to migrate legacy settings due to no material found for " + legacySettings.item().material() + "."));
+                    logger.error(AdventureUtil.deserialize("Unable to migrate legacy settings due to no material found for " + legacySettings.item().material() + "."));
                     settings = null;
                     return;
                 }
 
                 ItemType itemType = material.asItemType();
                 if(itemType == null) {
-                    logger.error(AdventureUtil.serialize("Unable to migrate legacy settings as there was no ItemType found for " + legacySettings.item().material() + "."));
+                    logger.error(AdventureUtil.deserialize("Unable to migrate legacy settings as there was no ItemType found for " + legacySettings.item().material() + "."));
                     settings = null;
                     return;
                 }
@@ -157,7 +157,7 @@ public class SettingsManager {
         try {
             return loader.load().get(LegacySettings.class);
         } catch (ConfigurateException e) {
-            logger.error(AdventureUtil.serialize("Failed to load legacy plugin settings: " + e.getMessage()));
+            logger.error(AdventureUtil.deserialize("Failed to load legacy plugin settings: " + e.getMessage()));
             return null;
         }
     }
