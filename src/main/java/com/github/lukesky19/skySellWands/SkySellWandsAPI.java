@@ -20,7 +20,9 @@ package com.github.lukesky19.skySellWands;
 import com.github.lukesky19.skySellWands.util.WandKeys;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * This class provides the SkySellWands API.
@@ -39,5 +41,19 @@ public class SkySellWandsAPI {
     public boolean isItemStackSellWand(@NotNull ItemStack itemStack) {
         PersistentDataContainer pdc = itemStack.getItemMeta().getPersistentDataContainer();
         return pdc.has(WandKeys.USES.getKey());
+    }
+
+    /**
+     * Is the provided {@link ItemStack} an infinite sell wand?
+     * @param itemStack The {@link ItemStack} to check.
+     * @return true if an infinite sell wand, otherwise false.
+     */
+    public boolean isItemStackInfiniteSellWand(@NotNull ItemStack itemStack) {
+        PersistentDataContainer pdc = itemStack.getItemMeta().getPersistentDataContainer();
+
+        @Nullable Integer uses = pdc.get(WandKeys.USES.getKey(), PersistentDataType.INTEGER);
+        if(uses == null) return false;
+
+        return uses == -1;
     }
 }
