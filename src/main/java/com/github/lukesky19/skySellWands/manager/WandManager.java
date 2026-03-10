@@ -76,7 +76,10 @@ public class WandManager {
         List<TagResolver.Single> placeholders = List.of(Placeholder.parsed("uses", String.valueOf(uses)));
 
         // Create the ItemStack
-        Optional<ItemStack> optionalItemStack = new ItemStackBuilder(logger).fromItemStackConfig(settings.item(), null, null, placeholders).setMaxStackSize(1).buildItemStack();
+        Optional<ItemStack> optionalItemStack = new ItemStackBuilder(logger)
+                .fromItemStackConfig(settings.item(), null, placeholders)
+                .setMaxStackSize(1)
+                .buildItemStack();
         if(optionalItemStack.isEmpty()) {
             logger.error(AdventureUtil.deserialize("Failed to create the ItemStack for the sell wand. Double-check your configuration."));
             player.sendMessage(AdventureUtil.deserialize(locale.prefix() + "<red>Failed to create the ItemStack for the sell wand. Double-check your configuration.</red>"));
@@ -120,7 +123,10 @@ public class WandManager {
         List<TagResolver.Single> placeholders = List.of(Placeholder.parsed("uses", "unlimited"));
 
         // Create the ItemStack
-        Optional<ItemStack> optionalItemStack = new ItemStackBuilder(logger).fromItemStackConfig(settings.item(), null, null, placeholders).setMaxStackSize(1).buildItemStack();
+        Optional<ItemStack> optionalItemStack = new ItemStackBuilder(logger)
+                .fromItemStackConfig(settings.item(), null, placeholders)
+                .setMaxStackSize(1)
+                .buildItemStack();
         if(optionalItemStack.isEmpty()) {
             logger.error(AdventureUtil.deserialize("Failed to create the ItemStack for the sell wand. Double-check your configuration."));
             player.sendMessage(AdventureUtil.deserialize(locale.prefix() + "<red>Failed to create the ItemStack for the sell wand. Double-check your configuration.</red>"));

@@ -119,7 +119,7 @@ public class SettingsManager {
                 }
 
                 ItemStackConfig itemStackConfig = new ItemStackConfig(
-                        itemType.getKey().getKey(),
+                        itemType,
                         null,
                         null,
                         legacySettings.item().name(),
