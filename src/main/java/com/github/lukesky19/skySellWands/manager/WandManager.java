@@ -21,9 +21,9 @@ import com.github.lukesky19.skySellWands.SkySellWands;
 import com.github.lukesky19.skySellWands.configuration.Locale;
 import com.github.lukesky19.skySellWands.configuration.Settings;
 import com.github.lukesky19.skySellWands.util.WandKeys;
-import com.github.lukesky19.skylib.api.adventure.AdventureUtil;
-import com.github.lukesky19.skylib.api.itemstack.ItemStackBuilder;
-import com.github.lukesky19.skylib.api.player.PlayerUtil;
+import com.github.lukesky19.skylib.common.api.adventure.AdventureUtility;
+import com.github.lukesky19.skylib.paper.api.itemstack.ItemStackBuilder;
+import com.github.lukesky19.skylib.paper.api.player.PlayerUtil;
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
@@ -68,8 +68,8 @@ public class WandManager {
      */
     public void giveWand(Player player, int uses, int amount) {
         // Get the plugin's settings
-        Locale locale = localeManager.getLocale();
-        Settings settings = settingsManager.getSettings();
+        Locale locale = localeManager.getConfiguration();
+        Settings settings = settingsManager.getConfiguration();
         if(settings == null) return;
 
         // Create the placeholders list
@@ -81,16 +81,16 @@ public class WandManager {
                 .setMaxStackSize(1)
                 .buildItemStack();
         if(optionalItemStack.isEmpty()) {
-            logger.error(AdventureUtil.deserialize("Failed to create the ItemStack for the sell wand. Double-check your configuration."));
-            player.sendMessage(AdventureUtil.deserialize(locale.prefix() + "<red>Failed to create the ItemStack for the sell wand. Double-check your configuration.</red>"));
+            logger.warn(AdventureUtility.plain("Failed to create the ItemStack for the sell wand. Double-check your configuration."));
+            player.sendMessage(AdventureUtility.deserialize(locale.prefix() + "<red>Failed to create the ItemStack for the sell wand. Double-check your configuration.</red>"));
             return;
         }
 
         ItemStack itemStack = optionalItemStack.get();
         ItemMeta itemMeta = itemStack.getItemMeta();
         if(itemMeta == null) {
-            logger.error(AdventureUtil.deserialize("Failed to get the ItemStack's ItemMeta for the sell wand. Double-check your configuration."));
-            player.sendMessage(AdventureUtil.deserialize(locale.prefix() + "<red>Failed to get the ItemStack's ItemMeta for the sell wand. Double-check your configuration.</red>"));
+            logger.warn(AdventureUtility.plain("Failed to get the ItemStack's ItemMeta for the sell wand. Double-check your configuration."));
+            player.sendMessage(AdventureUtility.deserialize(locale.prefix() + "<red>Failed to get the ItemStack's ItemMeta for the sell wand. Double-check your configuration.</red>"));
             return;
         }
 
@@ -105,7 +105,7 @@ public class WandManager {
         PlayerUtil.giveItem(player.getInventory(), itemStack, amount, player.getLocation());
 
         // Send the player a message that a sellwand was given
-        player.sendMessage(AdventureUtil.deserialize(locale.prefix() + locale.givenWand(), placeholders));
+        player.sendMessage(AdventureUtility.deserialize(locale.prefix() + locale.givenWand(), placeholders));
     }
 
     /**
@@ -115,8 +115,8 @@ public class WandManager {
      */
     public void giveUnlimitedWand(Player player, int amount) {
         // Get the plugin's settings
-        Locale locale = localeManager.getLocale();
-        Settings settings = settingsManager.getSettings();
+        Locale locale = localeManager.getConfiguration();
+        Settings settings = settingsManager.getConfiguration();
         if(settings == null) return;
 
         // Create the placeholders list
@@ -128,16 +128,16 @@ public class WandManager {
                 .setMaxStackSize(1)
                 .buildItemStack();
         if(optionalItemStack.isEmpty()) {
-            logger.error(AdventureUtil.deserialize("Failed to create the ItemStack for the sell wand. Double-check your configuration."));
-            player.sendMessage(AdventureUtil.deserialize(locale.prefix() + "<red>Failed to create the ItemStack for the sell wand. Double-check your configuration.</red>"));
+            logger.warn(AdventureUtility.plain("Failed to create the ItemStack for the sell wand. Double-check your configuration."));
+            player.sendMessage(AdventureUtility.deserialize(locale.prefix() + "<red>Failed to create the ItemStack for the sell wand. Double-check your configuration.</red>"));
             return;
         }
 
         ItemStack itemStack = optionalItemStack.get();
         ItemMeta itemMeta = itemStack.getItemMeta();
         if(itemMeta == null) {
-            logger.error(AdventureUtil.deserialize("Failed to get the ItemStack's ItemMeta for the sell wand. Double-check your configuration."));
-            player.sendMessage(AdventureUtil.deserialize(locale.prefix() + "<red>Failed to get the ItemStack's ItemMeta for the sell wand. Double-check your configuration.</red>"));
+            logger.warn(AdventureUtility.plain("Failed to get the ItemStack's ItemMeta for the sell wand. Double-check your configuration."));
+            player.sendMessage(AdventureUtility.deserialize(locale.prefix() + "<red>Failed to get the ItemStack's ItemMeta for the sell wand. Double-check your configuration.</red>"));
             return;
         }
 
@@ -152,6 +152,6 @@ public class WandManager {
         PlayerUtil.giveItem(player.getInventory(), itemStack, amount, player.getLocation());
 
         // Send the player a message that a sellwand was given
-        player.sendMessage(AdventureUtil.deserialize(locale.prefix() + locale.givenWand(), placeholders));
+        player.sendMessage(AdventureUtility.deserialize(locale.prefix() + locale.givenWand(), placeholders));
     }
 }

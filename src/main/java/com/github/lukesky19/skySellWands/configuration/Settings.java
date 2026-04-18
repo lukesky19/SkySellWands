@@ -17,19 +17,19 @@
 */
 package com.github.lukesky19.skySellWands.configuration;
 
-import com.github.lukesky19.skylib.api.itemstack.ItemStackConfig;
 import com.github.lukesky19.skylib.libs.configurate.objectmapping.ConfigSerializable;
+import com.github.lukesky19.skylib.paper.api.itemstack.ItemStackConfig;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
  * This record contains the plugin's configuration.
- * @param configVersion The config version.
+ * @param version The config version.
  * @param locale The plugin's locale.
  * @param item The {@link ItemStackConfig} for the sell wand.
  */
 @ConfigSerializable
 public record Settings(
-        @Nullable String configVersion,
+        int version,
         @Nullable String locale,
         @NotNull ItemStackConfig item) {}

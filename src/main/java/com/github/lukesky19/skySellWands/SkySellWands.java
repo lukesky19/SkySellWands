@@ -24,7 +24,8 @@ import com.github.lukesky19.skySellWands.manager.HookManager;
 import com.github.lukesky19.skySellWands.manager.LocaleManager;
 import com.github.lukesky19.skySellWands.manager.SettingsManager;
 import com.github.lukesky19.skySellWands.manager.WandManager;
-import com.github.lukesky19.skylib.api.adventure.AdventureUtil;
+import com.github.lukesky19.skylib.common.api.adventure.AdventureUtility;
+import com.github.lukesky19.skylib.paper.api.plugin.SkyPlugin;
 import com.github.lukesky19.skyshop.api.SkyShopAPI;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import net.milkbowl.vault.economy.Economy;
@@ -32,7 +33,6 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.ServicePriority;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -40,7 +40,7 @@ import java.util.List;
 /**
  * This class is the entry point to the plugin.
  */
-public final class SkySellWands extends JavaPlugin {
+public final class SkySellWands extends SkyPlugin {
     private SettingsManager settingsManager;
     private LocaleManager localeManager;
     private HookManager hookManager;
@@ -111,9 +111,10 @@ public final class SkySellWands extends JavaPlugin {
     /**
      * Method to reload the plugin.
      */
+    @Override
     public void reload() {
-        settingsManager.reload();
-        localeManager.reload();
+        settingsManager.loadConfiguration();
+        localeManager.loadConfiguration();
         hookManager.reload();
     }
 
@@ -130,7 +131,7 @@ public final class SkySellWands extends JavaPlugin {
             }
         }
 
-        this.getComponentLogger().error(AdventureUtil.deserialize("Failed to retrieve economy, disabling plugin."));
+        this.getComponentLogger().error(AdventureUtility.plain("Failed to retrieve economy, disabling plugin."));
         this.getServer().getPluginManager().disablePlugin(this);
         return false;
     }
@@ -148,7 +149,7 @@ public final class SkySellWands extends JavaPlugin {
             }
         }
 
-        this.getComponentLogger().error(AdventureUtil.deserialize("Failed to retrieve SkyShop's API, disabling plugin."));
+        this.getComponentLogger().error(AdventureUtility.plain("Failed to retrieve SkyShop's API, disabling plugin."));
         this.getServer().getPluginManager().disablePlugin(this);
         return false;
     }
@@ -163,14 +164,14 @@ public final class SkySellWands extends JavaPlugin {
         if (skyLib != null) {
             String version = skyLib.getPluginMeta().getVersion();
             String[] splitVersion = version.split("\\.");
-            int second = Integer.parseInt(splitVersion[1]);
+            int first = Integer.parseInt(splitVersion[0]);
 
-            if(second >= 3) {
+            if(first >= 2) {
                 return true;
             }
         }
 
-        this.getComponentLogger().error(AdventureUtil.deserialize("SkyLib Version 1.3.0.0 or newer is required to run this plugin."));
+        this.getComponentLogger().error(AdventureUtility.plain("SkyLib Version 2.0.0.0 or newer is required to run this plugin."));
         this.getServer().getPluginManager().disablePlugin(this);
         return false;
     }

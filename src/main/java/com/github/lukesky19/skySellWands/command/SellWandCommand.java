@@ -21,7 +21,7 @@ import com.github.lukesky19.skySellWands.SkySellWands;
 import com.github.lukesky19.skySellWands.configuration.Locale;
 import com.github.lukesky19.skySellWands.manager.LocaleManager;
 import com.github.lukesky19.skySellWands.manager.WandManager;
-import com.github.lukesky19.skylib.api.adventure.AdventureUtil;
+import com.github.lukesky19.skylib.common.api.adventure.AdventureUtility;
 import com.mojang.brigadier.Message;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -69,11 +69,11 @@ public class SellWandCommand {
         builder.then(Commands.literal("help")
             .requires(ctx -> ctx.getSender().hasPermission("skysellwands.commands.skysellwands.help"))
             .executes(ctx -> {
-                Locale locale = localeManager.getLocale();
+                Locale locale = localeManager.getConfiguration();
                 
                 CommandSender sender = ctx.getSource().getSender();
                 for(String message : locale.help()) {
-                    sender.sendMessage(AdventureUtil.deserialize(message));
+                    sender.sendMessage(AdventureUtility.deserialize(message));
                 }
                 
                 return 1;
@@ -83,12 +83,12 @@ public class SellWandCommand {
         builder.then(Commands.literal("reload")
             .requires(ctx -> ctx.getSender().hasPermission("skysellwands.commands.skysellwands.reload"))
             .executes(ctx -> {
-                Locale locale = localeManager.getLocale();
+                Locale locale = localeManager.getConfiguration();
                 CommandSender sender = ctx.getSource().getSender();
 
                 skySellWands.reload();
 
-                sender.sendMessage(AdventureUtil.deserialize(locale.prefix() + locale.configReload()));
+                sender.sendMessage(AdventureUtility.deserialize(locale.prefix() + locale.configReload()));
                 
                 return 1;
             })
@@ -99,7 +99,7 @@ public class SellWandCommand {
             .then(Commands.argument("player name", ArgumentTypes.player())
                 .then(Commands.argument("uses", IntegerArgumentType.integer())
                     .suggests((commandContext, suggestionsBuilder) -> {
-                        Message message = MessageComponentSerializer.message().serialize(AdventureUtil.deserialize("<green>A value of -1 will set the sell wand to have infinite uses.</green>"));
+                        Message message = MessageComponentSerializer.message().serialize(AdventureUtility.deserialize("<green>A value of -1 will set the sell wand to have infinite uses.</green>"));
                         suggestionsBuilder.suggest(-1, message);
 
                         return suggestionsBuilder.buildFuture();

@@ -24,7 +24,7 @@ import com.github.lukesky19.skySellWands.manager.HookManager;
 import com.github.lukesky19.skySellWands.manager.LocaleManager;
 import com.github.lukesky19.skySellWands.manager.SettingsManager;
 import com.github.lukesky19.skySellWands.util.WandKeys;
-import com.github.lukesky19.skylib.api.adventure.AdventureUtil;
+import com.github.lukesky19.skylib.paper.api.adventure.PaperAdventureUtility;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
@@ -93,9 +93,9 @@ public class PlayerClickListener implements Listener {
         // Only try to use a sell wand if the action was a left click
         if(!action.isLeftClick()) return;
         // Get the plugin's locale
-        Locale locale = localeManager.getLocale();
+        Locale locale = localeManager.getConfiguration();
         // Get the plugin's settings
-        Settings settings = settingsManager.getSettings();
+        Settings settings = settingsManager.getConfiguration();
         if(settings == null) return;
 
         // Get the item the player's main hand
@@ -114,7 +114,7 @@ public class PlayerClickListener implements Listener {
 
         // Check if the player can access the container before selling
         if(!hookManager.canPlayerOpen(player, block.getLocation())) {
-            player.sendMessage(AdventureUtil.deserialize(player, locale.prefix() + locale.noAccess()));
+            player.sendMessage(PaperAdventureUtility.deserialize(player, locale.prefix() + locale.noAccess()));
             return;
         }
 
@@ -126,7 +126,7 @@ public class PlayerClickListener implements Listener {
         Inventory inventory = container.getInventory();
         // If the container's inventory is empty, send a message and return.
         if(container.getInventory().isEmpty()) {
-            player.sendMessage(AdventureUtil.deserialize(player, locale.prefix() + locale.containerInventoryEmpty()));
+            player.sendMessage(PaperAdventureUtility.deserialize(player, locale.prefix() + locale.containerInventoryEmpty()));
             return;
         }
 
@@ -134,7 +134,7 @@ public class PlayerClickListener implements Listener {
         boolean result = skySellWands.getSkyShopAPI().sellInventory(player, inventory, false, false, false);
         // Send a message if no items were sold and return.
         if(!result) {
-            player.sendMessage(AdventureUtil.deserialize(player, locale.prefix() + locale.noItemsSold()));
+            player.sendMessage(PaperAdventureUtility.deserialize(player, locale.prefix() + locale.noItemsSold()));
             return;
         }
 
@@ -149,7 +149,7 @@ public class PlayerClickListener implements Listener {
         List<TagResolver.Single> placeholders = List.of(Placeholder.parsed("bal", bal));
 
         // Send player a success message
-        player.sendMessage(AdventureUtil.deserialize(player,locale.prefix() + locale.sellSuccess(), placeholders));
+        player.sendMessage(PaperAdventureUtility.deserialize(player,locale.prefix() + locale.sellSuccess(), placeholders));
 
         // If the uses are not unlimited (-1), update the number of uses
         if(uses != -1) {
@@ -161,10 +161,10 @@ public class PlayerClickListener implements Listener {
             if(updatedUses == 0) {
                 player.getInventory().remove(handItem);
 
-                player.sendMessage(AdventureUtil.deserialize(player, locale.prefix() + locale.wandUsedUp()));
+                player.sendMessage(PaperAdventureUtility.deserialize(player, locale.prefix() + locale.wandUsedUp()));
             } else {
                 List<TagResolver.Single> lorePlaceholders = List.of(Placeholder.parsed("uses", String.valueOf(updatedUses)));
-                List<Component> lore = settings.item().lore().stream().map(string -> AdventureUtil.deserialize(player, string, lorePlaceholders)).toList();
+                List<Component> lore = settings.item().lore().stream().map(string -> PaperAdventureUtility.deserialize(player, string, lorePlaceholders)).toList();
 
                 itemMeta.lore(lore);
 

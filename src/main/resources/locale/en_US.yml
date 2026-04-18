@@ -1,4 +1,4 @@
-config-version: 1.3.0
+version: 5
 prefix: "<aqua><bold>SkySellWands</bold></aqua><gray> ▪ </gray>"
 help:
     - "<aqua>SkySellWands is developed by <white><bold>lukeskywlker19</bold></white>.</aqua>"

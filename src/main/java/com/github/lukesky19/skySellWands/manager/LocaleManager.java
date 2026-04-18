@@ -20,14 +20,14 @@ package com.github.lukesky19.skySellWands.manager;
 import com.github.lukesky19.skySellWands.SkySellWands;
 import com.github.lukesky19.skySellWands.configuration.Locale;
 import com.github.lukesky19.skySellWands.configuration.Settings;
-import com.github.lukesky19.skylib.api.adventure.AdventureUtil;
-import com.github.lukesky19.skylib.api.configurate.ConfigurationUtility;
+import com.github.lukesky19.skylib.common.api.adventure.AdventureUtility;
+import com.github.lukesky19.skylib.common.api.configuration.abstracts.SimpleConfigManager;
 import com.github.lukesky19.skylib.libs.configurate.ConfigurateException;
 import com.github.lukesky19.skylib.libs.configurate.ConfigurationNode;
+import com.github.lukesky19.skylib.libs.configurate.serialize.SerializationException;
 import com.github.lukesky19.skylib.libs.configurate.yaml.YamlConfigurationLoader;
-import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -36,13 +36,10 @@ import java.util.List;
 /**
  * This class manages the plugin's locale configuration.
  */
-public class LocaleManager {
-    private final @NotNull SkySellWands skySellWands;
-    private final @NotNull SettingsManager settingsManager;
-
-    private @Nullable Locale locale;
-    private final @NotNull Locale DEFAULT_LOCALE = new Locale(
-            "1.2.0",
+public class LocaleManager extends SimpleConfigManager<Locale> {
+    private final @NonNull SettingsManager settingsManager;
+    private final @NonNull Locale DEFAULT_LOCALE = new Locale(
+            5,
             "<aqua><bold>SkySellWands</bold></aqua><gray> ▪ </gray>",
             List.of(
                     "<aqua>SkySellWands is developed by <white><bold>lukeskywlker19</bold></white>.</aqua>",
@@ -66,9 +63,9 @@ public class LocaleManager {
      * @param settingsManager A settings manager instance.
      */
     public LocaleManager(
-            @NotNull SkySellWands skySellWands,
-            @NotNull SettingsManager settingsManager) {
-        this.skySellWands = skySellWands;
+            @NonNull SkySellWands skySellWands,
+            @NonNull SettingsManager settingsManager) {
+        super(skySellWands, Locale.class);
         this.settingsManager = settingsManager;
     }
 
@@ -77,59 +74,193 @@ public class LocaleManager {
      * If the plugin's locale config failed to load, the default locale will be provided.
      * @return The plugin's {@link Locale}.
      */
-    public @NotNull Locale getLocale() {
-        if(locale == null) return DEFAULT_LOCALE;
-
-        return locale;
+    @Override
+    public @NonNull Locale getConfiguration() {
+        if(configuration == null) return DEFAULT_LOCALE;
+        return configuration;
     }
 
-    /**
-     * A method to reload the plugin's locale config.
-     */
-    public void reload() {
-        locale = null;
+    @Override
+    public void loadConfiguration() {
+        configuration = null;
 
-        Settings settings = settingsManager.getSettings();
+        Settings settings = settingsManager.getConfiguration();
         if(settings == null) return;
+        if(settings.locale() == null) return;
+        configurationPath = Path.of(plugin.getDirectoryFile() + File.separator + "locale" + File.separator + (settings.locale() + ".yml"));
 
-        copyDefaultLocales();
+        YamlConfigurationLoader loader = createLoader(configurationPath);
+        try {
+            ConfigurationNode root = loader.load();
+            int version = getVersion(root);
 
-        String localeString = settings.locale();
+            boolean saveConfiguration = false;
+            Locale locale;
+            switch(version) {
+                case 5 -> {
+                    locale = root.get(Locale.class);
+                    if(locale == null) {
+                        logger.warn(AdventureUtility.plain("Failed to load version " + version + " for locale " + settings.locale() + "."));
+                        return;
+                    }
+                }
 
-        if(localeString != null) {
-            Path path = Path.of(skySellWands.getDataFolder() + File.separator + "locale" + File.separator + (localeString + ".yml"));
+                // 4 -> 5
+                case 4 -> {
+                    locale = root.get(Locale.class);
+                    if(locale == null) {
+                        logger.warn(AdventureUtility.plain("Failed to load version " + version + " for locale " + settings.locale() + "."));
+                        return;
+                    }
 
-            YamlConfigurationLoader loader = ConfigurationUtility.getYamlConfigurationLoader(path);
-            try {
-                locale = loader.load().get(Locale.class);
-            } catch (ConfigurateException e) {
-                throw new RuntimeException(e);
+                    locale = new Locale(
+                            5,
+                            locale.prefix(),
+                            locale.help(),
+                            locale.configReload(),
+                            locale.givenWand(),
+                            locale.sellSuccess(),
+                            locale.containerInventoryEmpty(),
+                            locale.noItemsSold(),
+                            locale.wandUsedUp(),
+                            locale.noAccess());
+
+                    saveConfiguration = true;
+                }
+
+                // 3 -> 5
+                case 3 -> {
+                    locale = root.get(Locale.class);
+                    if(locale == null) {
+                        logger.warn(AdventureUtility.plain("Failed to load version " + version + " for locale " + settings.locale() + "."));
+                        return;
+                    }
+
+                    List<String> help = locale.help();
+                    help.removeLast();
+                    help.add("<white>/<aqua>sellwand</aqua> <yellow>give</yellow> <yellow><player_name></yellow> <yellow><# of uses></yellow> <yellow><amount></yellow></white>");
+
+                    locale = new Locale(
+                            5,
+                            locale.prefix(),
+                            help,
+                            locale.configReload(),
+                            locale.givenWand(),
+                            locale.sellSuccess(),
+                            locale.containerInventoryEmpty(),
+                            locale.noItemsSold(),
+                            locale.wandUsedUp(),
+                            locale.noAccess());
+
+                    saveConfiguration = true;
+                }
+
+                // 2 -> 5
+                case 2 -> {
+                    locale = root.get(Locale.class);
+                    if(locale == null) {
+                        logger.warn(AdventureUtility.plain("Failed to load version " + version + " for locale " + settings.locale() + "."));
+                        return;
+                    }
+
+                    List<String> help = locale.help();
+                    help.removeLast();
+                    help.add("<white>/<aqua>sellwand</aqua> <yellow>give</yellow> <yellow><player_name></yellow> <yellow><# of uses></yellow> <yellow><amount></yellow></white>");
+
+                    locale = new Locale(
+                            5,
+                            locale.prefix(),
+                            help,
+                            locale.configReload(),
+                            locale.givenWand(),
+                            locale.sellSuccess(),
+                            locale.containerInventoryEmpty(),
+                            locale.noItemsSold(),
+                            locale.wandUsedUp(),
+                            "<red>You do not have access to this container to sell the items inside.</red>");
+
+                    saveConfiguration = true;
+                }
+
+                // 1 -> 5
+                case 1 -> {
+                    locale = root.get(Locale.class);
+                    if(locale == null) {
+                        logger.warn(AdventureUtility.plain("Failed to load version " + version + " for locale " + settings.locale() + "."));
+                        return;
+                    }
+
+                    List<String> help = locale.help();
+                    help.removeLast();
+                    help.add("<white>/<aqua>sellwand</aqua> <yellow>give</yellow> <yellow><player_name></yellow> <yellow><# of uses></yellow> <yellow><amount></yellow></white>");
+
+                    locale = new Locale(
+                            5,
+                            locale.prefix(),
+                            help,
+                            locale.configReload(),
+                            locale.givenWand(),
+                            locale.sellSuccess(),
+                            locale.containerInventoryEmpty(),
+                            locale.noItemsSold(),
+                            locale.wandUsedUp(),
+                            "<red>You do not have access to this container to sell the items inside.</red>");
+
+                    saveConfiguration = true;
+                }
+
+                default -> {
+                    logger.warn(AdventureUtility.plain("Failed to load version " + version + " for locale " + settings.locale() + " due to an unsupported config version."));
+                    return;
+                }
             }
 
-            migrateLocale();
-            checkLocale();
+            // Check if the configuration is invalid
+            if(!validateConfiguration(locale)) {
+                logger.warn(AdventureUtility.plain("Configuration validation failed for locale " + settings.locale() + "."));
+                return;
+            }
+
+            // Save configuration if migrated
+            if(saveConfiguration) saveConfiguration(locale);
+
+            // Set the configuration
+            configuration = locale;
+        } catch (ConfigurateException configurateException) {
+            logger.error(AdventureUtility.plain("Failed to load the plugin's locale configuration. Error: " + configurateException.getMessage()));
         }
     }
 
     /**
      * Copies the default locale files that come bundled with the plugin, if they do not exist at least.
      */
-    private void copyDefaultLocales() {
-        Path path = Path.of(skySellWands.getDataFolder() + File.separator + "locale" + File.separator + "en_US.yml");
+    @Override
+    public void saveDefaultConfiguration() {
+        Path path = Path.of(plugin.getDirectoryFile() + File.separator + "locale" + File.separator + "en_US.yml");
         if (!path.toFile().exists()) {
-            skySellWands.saveResource("locale" + File.separator + "en_US.yml", false);
+            plugin.saveResource("locale" + File.separator + "en_US.yml", false);
         }
+    }
+
+    /**
+     * Currently no migration exists past version 5. The passed settings are returned.
+     * @param locale The {@link Locale} to migrate.
+     * @return The {@link Locale} passed.
+     */
+    @Override
+    public @Nullable Locale migrateConfiguration(@NonNull Locale locale) {
+        return locale;
     }
 
     /**
      * Checks if any locale strings are missing (null).
      * Sets locale to null if so, resulting in the default locale being used.
      */
-    private void checkLocale() {
-        final ComponentLogger logger = skySellWands.getComponentLogger();
-        if(locale == null) return;
+    @Override
+    public boolean validateConfiguration(@Nullable Locale locale) {
+        if(locale == null) return false;
 
-        if (locale.configVersion() == null
+        if (locale.version() != 5
                 || locale.prefix() == null
                 || locale.help() == null
                 || locale.configReload() == null
@@ -139,107 +270,62 @@ public class LocaleManager {
                 || locale.noItemsSold() == null
                 || locale.wandUsedUp() == null
                 || locale.noAccess() == null) {
-            locale = null;
+            configuration = null;
 
-            logger.warn(AdventureUtil.deserialize("<yellow>Your locale configuration is invalid. The plugin will use an internal locale instead."));
+            logger.warn(AdventureUtility.deserialize("<yellow>Your locale configuration is invalid. The plugin will use an internal locale instead."));
+
+            return false;
         }
+
+        return true;
     }
 
     /**
-     * Migrates the plugin's locale from any legacy versions.
+     * Get the version number.
+     * @param root The root {@link com.github.lukesky19.skylib.libs.configurate.ConfigurationNode}.
+     * @return The config version.
      */
-    private void migrateLocale() {
-        if(locale == null) return;
+    private int getVersion(@NonNull ConfigurationNode root) {
+        com.github.lukesky19.skylib.libs.configurate.ConfigurationNode versionNode = root.node("version");
+        int version = versionNode.getInt();
 
-        switch(locale.configVersion()) {
-            case "1.3.0" -> {
-                // Current version, do nothing
-            }
+        com.github.lukesky19.skylib.libs.configurate.ConfigurationNode legacyVersionNode = root.node("config-version");
+        String legacyVersion = legacyVersionNode.virtual() ? null : legacyVersionNode.getString();
+        if(legacyVersion != null) {
+            try {
+                switch (legacyVersion) {
+                    case "1.3.0" -> {
+                        versionNode.set(4);
+                        version = 4;
+                    }
 
-            case "1.2.0" -> {
-                // 1.2.0 -> 1.3.0
-                List<String> help = locale.help();
-                help.removeLast();
-                help.add("<white>/<aqua>sellwand</aqua> <yellow>give</yellow> <yellow><player_name></yellow> <yellow><# of uses></yellow> <yellow><amount></yellow></white>");
+                    case "1.2.0" -> {
+                        versionNode.set(3);
+                        version = 3;
+                    }
 
-                locale = new Locale(
-                        "1.3.0",
-                        locale.prefix(),
-                        help,
-                        locale.configReload(),
-                        locale.givenWand(),
-                        locale.sellSuccess(),
-                        locale.containerInventoryEmpty(),
-                        locale.noItemsSold(),
-                        locale.wandUsedUp(),
-                        locale.noAccess());
+                    case "1.1.0" -> {
+                        versionNode.set(2);
+                        version = 2;
+                    }
 
-                saveLocale(locale);
-            }
 
-            case "1.1.0" -> {
-                // 1.1.0 -> 1.3.0
-                List<String> help = locale.help();
-                help.removeLast();
-                help.add("<white>/<aqua>sellwand</aqua> <yellow>give</yellow> <yellow><player_name></yellow> <yellow><# of uses></yellow> <yellow><amount></yellow></white>");
+                    case "1.0.0" -> {
+                        versionNode.set(1);
+                        version = 1;
+                    }
 
-                locale = new Locale(
-                        "1.3.0",
-                        locale.prefix(),
-                        help,
-                        locale.configReload(),
-                        locale.givenWand(),
-                        locale.sellSuccess(),
-                        locale.containerInventoryEmpty(),
-                        locale.noItemsSold(),
-                        locale.wandUsedUp(),
-                        "<red>You do not have access to this container to sell the items inside.</red>");
-
-                saveLocale(locale);
-            }
-
-            case "1.0.0" -> {
-                // 1.0.0 -> 1.3.0
-                List<String> help = locale.help();
-                help.removeLast();
-                help.add("<white>/<aqua>sellwand</aqua> <yellow>give</yellow> <yellow><player_name></yellow> <yellow><# of uses></yellow> <yellow><amount></yellow></white>");
-
-                locale = new Locale(
-                        "1.3.0",
-                        locale.prefix(),
-                        help,
-                        locale.configReload(),
-                        locale.givenWand(),
-                        locale.sellSuccess(),
-                        locale.containerInventoryEmpty(),
-                        locale.noItemsSold(),
-                        locale.wandUsedUp(),
-                        "<red>You do not have access to this container to sell the items inside.</red>");
-
-                saveLocale(locale);
+                    default -> {
+                        versionNode.set(0);
+                        version = 0;
+                    }
+                }
+            } catch (SerializationException e) {
+                logger.warn(AdventureUtility.plain("Failed to convert String-based version to numeric version"));
+                version = 0;
             }
         }
-    }
 
-    /**
-     * Saves the provided {@link Locale} to the disk.
-     * @param locale The {@link Locale} to save.
-     */
-    private void saveLocale(@NotNull Locale locale) {
-        Settings settings = settingsManager.getSettings();
-        if(settings == null) return;
-
-        String localeString = settings.locale();
-        Path path = Path.of(skySellWands.getDataFolder() + File.separator + "locale" + File.separator + (localeString + ".yml"));
-
-        YamlConfigurationLoader loader = ConfigurationUtility.getYamlConfigurationLoader(path);
-        ConfigurationNode node = loader.createNode();
-
-        try {
-            node.set(locale);
-            loader.save(node);
-        } catch (ConfigurateException e) {
-            throw new RuntimeException(e);
-        }
+        return version;
     }
 }

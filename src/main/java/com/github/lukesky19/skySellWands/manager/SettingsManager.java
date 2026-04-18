@@ -20,163 +20,196 @@ package com.github.lukesky19.skySellWands.manager;
 import com.github.lukesky19.skySellWands.SkySellWands;
 import com.github.lukesky19.skySellWands.configuration.LegacySettings;
 import com.github.lukesky19.skySellWands.configuration.Settings;
-import com.github.lukesky19.skylib.api.adventure.AdventureUtil;
-import com.github.lukesky19.skylib.api.configurate.ConfigurationUtility;
-import com.github.lukesky19.skylib.api.itemstack.ItemStackConfig;
+import com.github.lukesky19.skylib.common.api.adventure.AdventureUtility;
+import com.github.lukesky19.skylib.common.api.configuration.abstracts.SimpleConfigManager;
 import com.github.lukesky19.skylib.libs.configurate.ConfigurateException;
 import com.github.lukesky19.skylib.libs.configurate.ConfigurationNode;
+import com.github.lukesky19.skylib.libs.configurate.serialize.SerializationException;
 import com.github.lukesky19.skylib.libs.configurate.yaml.YamlConfigurationLoader;
-import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
+import com.github.lukesky19.skylib.paper.api.itemstack.ItemStackBuilder;
+import com.github.lukesky19.skylib.paper.api.itemstack.ItemStackConfig;
 import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ItemType;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.io.File;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * This class manages the plugin's settings.
  */
-public class SettingsManager {
-    private final @NotNull SkySellWands skySellWands;
-    private final @NotNull ComponentLogger logger;
-    private @Nullable Settings settings;
-
+public class SettingsManager extends SimpleConfigManager<Settings> {
     /**
      * Constructor
      * @param skySellWands A {@link SkySellWands} instance.
      */
     public SettingsManager(@NotNull SkySellWands skySellWands) {
-        this.skySellWands = skySellWands;
-        this.logger = skySellWands.getComponentLogger();
+        super(skySellWands, Path.of(skySellWands.getDataFolder() + File.separator + "settings.yml"), Settings.class);
+    }
+
+    @Override
+    public void loadConfiguration() {
+        configuration = null;
+        if(configurationPath == null) return;
+
+        YamlConfigurationLoader loader = createLoader(configurationPath);
+        try {
+            ConfigurationNode root = loader.load();
+            int version = getVersion(root);
+
+            Settings settings;
+            switch(version) {
+                case 3 -> {
+                    settings = root.get(Settings.class);
+                    if(settings == null) {
+                        logger.warn(AdventureUtility.plain("Failed to load version " + version + " plugin settings."));
+                        return;
+                    }
+                }
+
+                case 2 -> {
+                    settings = root.get(Settings.class);
+                    if(settings == null) {
+                        logger.warn(AdventureUtility.plain("Failed to load version " + version + " plugin settings."));
+                        return;
+                    }
+
+                    settings = new Settings(3, settings.locale(), settings.item());
+                }
+
+                case 1 -> {
+                    LegacySettings legacySettings = root.get(LegacySettings.class);
+                    if(legacySettings == null) {
+                        logger.warn(AdventureUtility.plain("Unable to migrate legacy settings due to failure to load."));
+                        return;
+                    }
+
+                    if(legacySettings.item().material() == null) {
+                        logger.warn(AdventureUtility.plain("Unable to migrate legacy settings due to an invalid material."));
+                        return;
+                    }
+
+                    Material material = Material.getMaterial(legacySettings.item().material());
+                    if(material == null) {
+                        logger.warn(AdventureUtility.plain("Unable to migrate legacy settings due to no material found for " + legacySettings.item().material() + "."));
+                        return;
+                    }
+
+                    ItemType itemType = material.asItemType();
+                    if(itemType == null) {
+                        logger.warn(AdventureUtility.plain("Unable to migrate legacy settings as there was no ItemType found for " + legacySettings.item().material() + "."));
+                        return;
+                    }
+
+                    ItemStackConfig itemStackConfig = new ItemStackConfig(
+                            itemType,
+                            null,
+                            null,
+                            legacySettings.item().name(),
+                            legacySettings.item().lore(),
+                            null,
+                            null,
+                            List.of(),
+                            new ItemStackConfig.PotionConfig(null, List.of()),
+                            new ItemStackConfig.ColorConfig(false, null, null, null),
+                            null,
+                            List.of(),
+                            new ItemStackConfig.DecoratedPotConfig(null, null, null, null),
+                            new ItemStackConfig.ArmorTrimConfig(null, null),
+                            List.of(),
+                            new ItemStackConfig.OptionsConfig(legacySettings.item().enchanted(), null, null, null, null));
+
+
+                    settings = new Settings(3, legacySettings.locale(), itemStackConfig);
+                }
+
+                default -> {
+                    logger.warn(AdventureUtility.plain("Failed to load version " + version + " plugin settings due to an unsupported config version."));
+                    return;
+                }
+            }
+
+            // Check if the configuration is invalid
+            if(!validateConfiguration(settings)) {
+                logger.warn(AdventureUtility.plain("Configuration validation failed for plugin settings"));
+                return;
+            }
+
+            // Set the configuration
+            configuration = settings;
+        } catch (ConfigurateException configurateException) {
+            logger.error(AdventureUtility.plain("Failed to load the configuration. Error: " + configurateException.getMessage()));
+        }
+    }
+
+    @Override
+    public void saveDefaultConfiguration() {
+        plugin.saveResource("settings.yml", false);
     }
 
     /**
-     * Get the plugin's settings.
-     * @return The plugin's {@link Settings}.
+     * Currently no migration exists past version 3. The passed settings are returned.
+     * @param settings The {@link Settings} to migrate.
+     * @return The {@link Settings} passed.
      */
-    public @Nullable Settings getSettings() {
+    @Override
+    public @NonNull Settings migrateConfiguration(@NonNull Settings settings) {
         return settings;
     }
 
-    /**
-     * A method to reload the plugin's settings.
-     */
-    public void reload() {
-        settings = null;
-        Path path = Path.of(skySellWands.getDataFolder() + File.separator + "settings.yml");
-        if(!path.toFile().exists()) {
-            skySellWands.saveResource("settings.yml", false);
-        }
+    @Override
+    public boolean validateConfiguration(@Nullable Settings settings) {
+        if(settings == null) return false;
+        if(settings.version() != 3) return false;
+        if(settings.locale() == null) return false;
 
-        YamlConfigurationLoader loader = ConfigurationUtility.getYamlConfigurationLoader(path);
-        try {
-            settings = loader.load().get(Settings.class);
-        } catch (ConfigurateException e) {
-            logger.error(AdventureUtil.deserialize("Failed to load plugin settings: " + e.getMessage()));
-            return;
-        }
+        Optional<ItemStack> optionalItemStack = new ItemStackBuilder(logger)
+                .fromItemStackConfig(settings.item(), null, List.of())
+                .buildItemStack();
 
-        migrateSettings();
+        return optionalItemStack.isPresent();
     }
 
     /**
-     * Migrates the plugin's settings from any legacy versions.
+     * Get the version number.
+     * @param root The root {@link com.github.lukesky19.skylib.libs.configurate.ConfigurationNode}.
+     * @return The config version.
      */
-    private void migrateSettings() {
-        if(settings == null) return;
+    private int getVersion(@NonNull ConfigurationNode root) {
+        com.github.lukesky19.skylib.libs.configurate.ConfigurationNode versionNode = root.node("version");
+        int version = versionNode.getInt();
 
-        switch(settings.configVersion()) {
-            case "1.1.0.0" -> {
-                // Current version, do nothing
+        com.github.lukesky19.skylib.libs.configurate.ConfigurationNode legacyVersionNode = root.node("config-version");
+        String legacyVersion = legacyVersionNode.virtual() ? null : legacyVersionNode.getString();
+        if(legacyVersion != null) {
+            try {
+                switch (legacyVersion) {
+                    case "1.1.0.0" -> {
+                        versionNode.set(2);
+                        version = 2;
+                    }
+
+                    case "1.0.0" -> {
+                        versionNode.set(1);
+                        version = 1;
+                    }
+
+                    default -> {
+                        versionNode.set(0);
+                        version = 0;
+                    }
+                }
+            } catch (SerializationException e) {
+                logger.warn(AdventureUtility.plain("Failed to convert String-based version to numeric version"));
+                version = 0;
             }
-
-            // 1.1.0 -> 1.1.0.0
-            case "1.0.0" -> {
-                LegacySettings legacySettings = loadLegacySettings();
-                if(legacySettings == null) return;
-
-                if(legacySettings.item().material() == null) {
-                    logger.error(AdventureUtil.deserialize("Unable to migrate legacy settings due to an invalid material."));
-                    settings = null;
-                    return;
-                }
-
-                Material material = Material.getMaterial(legacySettings.item().material());
-                if(material == null) {
-                    logger.error(AdventureUtil.deserialize("Unable to migrate legacy settings due to no material found for " + legacySettings.item().material() + "."));
-                    settings = null;
-                    return;
-                }
-
-                ItemType itemType = material.asItemType();
-                if(itemType == null) {
-                    logger.error(AdventureUtil.deserialize("Unable to migrate legacy settings as there was no ItemType found for " + legacySettings.item().material() + "."));
-                    settings = null;
-                    return;
-                }
-
-                ItemStackConfig itemStackConfig = new ItemStackConfig(
-                        itemType,
-                        null,
-                        null,
-                        legacySettings.item().name(),
-                        legacySettings.item().lore(),
-                        null,
-                        null,
-                        List.of(),
-                        new ItemStackConfig.PotionConfig(null, List.of()),
-                        new ItemStackConfig.ColorConfig(false, null, null, null),
-                        null,
-                        List.of(),
-                        new ItemStackConfig.DecoratedPotConfig(null, null, null, null),
-                        new ItemStackConfig.ArmorTrimConfig(null, null),
-                        List.of(),
-                        new ItemStackConfig.OptionsConfig(legacySettings.item().enchanted(), null, null, null, null));
-
-
-                settings = new Settings("1.1.0.0", legacySettings.locale(), itemStackConfig);
-
-                saveSettings(settings);
-            }
-
-            case null, default -> throw new IllegalStateException("Unexpected value: " + settings.configVersion());
         }
-    }
 
-    /**
-     * Load the plugin's settings to {@link LegacySettings} for migration.
-     * @return The {@link LegacySettings} or null.
-     */
-    private @Nullable LegacySettings loadLegacySettings() {
-        Path path = Path.of(skySellWands.getDataFolder() + File.separator + "settings.yml");
-
-        YamlConfigurationLoader loader = ConfigurationUtility.getYamlConfigurationLoader(path);
-        try {
-            return loader.load().get(LegacySettings.class);
-        } catch (ConfigurateException e) {
-            logger.error(AdventureUtil.deserialize("Failed to load legacy plugin settings: " + e.getMessage()));
-            return null;
-        }
-    }
-
-    /**
-     * Saves the provided {@link Settings} to the disk.
-     * @param settings The {@link Settings} to save.
-     */
-    private void saveSettings(@NotNull Settings settings) {
-        Path path = Path.of(skySellWands.getDataFolder() + File.separator + "settings.yml");
-
-        YamlConfigurationLoader loader = ConfigurationUtility.getYamlConfigurationLoader(path);
-        ConfigurationNode node = loader.createNode();
-
-        try {
-            node.set(settings);
-            loader.save(node);
-        } catch (ConfigurateException e) {
-            throw new RuntimeException(e);
-        }
+        return version;
     }
 }
