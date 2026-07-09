@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "com.github.lukesky19"
-version = "1.7.0.0"
+version = "1.7.1.0"
 
 repositories {
     mavenLocal()
@@ -17,16 +17,19 @@ repositories {
 
 dependencies {
     // Paper
-    compileOnly("io.papermc.paper:paper-api:26.1.2.build.+")
+    compileOnly("io.papermc.paper:paper-api:26.2.build.+")
 
     // SkyLib
-    compileOnly("com.github.lukesky19:SkyLib:2.0.0.0")
+    compileOnly("com.github.lukesky19:SkyLib:2.0.2.0")
 
     // Integration
     compileOnly("com.github.MilkBowl:VaultAPI:1.7.1")
-    compileOnly("com.github.lukesky19:SkyShop:3.0.0.0")
+    compileOnly("com.github.lukesky19:SkyShop:3.3.1.0")
     compileOnly("world.bentobox:bentobox:2.7.0-SNAPSHOT")
-    compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.16-SNAPSHOT")
+    compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.17-SNAPSHOT") {
+        exclude(group = "com.google.code.gson")
+        exclude(group = "com.google.guava")
+    }
 }
 
 java {
