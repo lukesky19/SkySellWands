@@ -18,6 +18,7 @@
 package com.github.lukesky19.skySellWands;
 
 import com.github.lukesky19.skySellWands.command.SellWandCommand;
+import com.github.lukesky19.skySellWands.listener.CraftListener;
 import com.github.lukesky19.skySellWands.listener.ItemSoldListener;
 import com.github.lukesky19.skySellWands.listener.PlayerClickListener;
 import com.github.lukesky19.skySellWands.manager.HookManager;
@@ -89,12 +90,7 @@ public final class SkySellWands extends SkyPlugin {
         PlayerClickListener playerClickListener = new PlayerClickListener(this, settingsManager, localeManager, hookManager);
         SellWandCommand sellWandCommand = new SellWandCommand(this, localeManager, wandManager);
 
-        // Register Listener
-        this.getServer().getPluginManager().registerEvents(playerClickListener, this);
-
-        this.getServer().getPluginManager().registerEvents(new ItemSoldListener(), this);
-
-        // Register Command
+        // Register Commands
         this.getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS,
                 commands -> commands.registrar().register(sellWandCommand.createCommand(),
                         "Command to manage and use the SkySellWand plugin.",
@@ -103,6 +99,11 @@ public final class SkySellWands extends SkyPlugin {
         // Register API
         SkySellWandsAPI skySellWandsAPI = new SkySellWandsAPI();
         this.getServer().getServicesManager().register(SkySellWandsAPI.class, skySellWandsAPI, this, ServicePriority.Lowest);
+
+        // Register Listeners
+        this.getServer().getPluginManager().registerEvents(playerClickListener, this);
+        this.getServer().getPluginManager().registerEvents(new ItemSoldListener(), this);
+        this.getServer().getPluginManager().registerEvents(new CraftListener(skySellWandsAPI), this);
 
         // Reload the plugin
         reload();
